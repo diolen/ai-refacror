@@ -101,3 +101,10 @@ legacy navigation
 architecture understanding
 
  -----------------------------------------------------------------------------
+
+ СОХРАНЯЮ ИСТОРИЮ
+ python graph_v2_history.py
+
+ Проверка timeline
+ python cli.py memory timeline
+------------------------------------------------------------------------------

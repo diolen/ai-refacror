@@ -117,5 +117,15 @@ if __name__ == "__main__":
     elif command == "refactor":
         run_refactor(sys.argv[2:])
 
+    elif command == "graph":
+        from analysis.graph_builder import build_graph
+        file_path = sys.argv[2]
+        graph = build_graph(file_path)
+        print("\nDependency Graph:\n")
+        for model, methods in graph.items():
+            print(model)
+            for method in methods:
+                print(f"  └── {method}()")
+
     else:
         print("Unknown command")
