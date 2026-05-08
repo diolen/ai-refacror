@@ -1,0 +1,103 @@
+2026-05-08
+сделано: 
+1. построенна начальная структура проекта. 
+2. произведен первый прогон cli.py 
+3. поправлен memory.py и сделано изменение в базе данных при помощи migrate.py 
+4. произведен успешный запуск memory.py 
+Что дальше?
+
+-------------------------------------------------------------------------------
+1. выполнить миграцию
+python memory/migrate.py
+
+2. просканировать контроллер
+python cli.py scan ../sic/app/Controller/UsersController.php
+
+ЧТО ПРОИЗОЙДЁТ
+Система:
+
+найдёт модели:
+$this->User->
+$this->Order->
+
+создаст pattern:
+Models used together: User, Order
+
+сохранит pattern в memory
+🔍 КАК ПОСМОТРЕТЬ MEMORY
+python cli.py memory patterns
+
+output:
+---
+ID: 1
+Time: 2026-05-08T18:15:32.137134
+Type: pattern
+Text: Models used together: Auth, Cookie, OperationUnit, Session, SurveysPulse, User, Users, UsersCenter, UsersOperationUnit
+Confidence: 0.7
+
+
+ЧТО ТЫ ТОЛЬКО ЧТО ПОСТРОИЛ
+
+У тебя теперь есть:
+✅ dependency scanner
+✅ automatic pattern extractor
+✅ knowledge memory
+✅ architecture observations
+✅ persistent SQLite intelligence
+
+САМОЕ ВАЖНОЕ
+
+Ты начал строить:
+“архитектурную память проекта”
+а не просто AI-чат для кода.
+
+-------------------------------------------------------------------------------
+
+КОМАНДЫ ПОСЛЕ ОБНОВЛЕНИЯ
+
+сохранить bootstrap history
+python bootstrap_history.py
+
+посмотреть timeline
+python cli.py memory timeline
+
+посмотреть patterns
+python cli.py memory patterns
+
+сканировать зависимости
+python cli.py scan ../sic/app/Controller/UsersController.php
+
+------------------------------------------------------------------------------
+
+ПРАВИЛЬНАЯ ЭВОЛЮЦИЯ
+v1 scanner
+ → bad patterns
+
+v2 scanner
+ → better patterns
+
+v3 graph scanner
+ → semantic architecture graph
+
+СЛЕДУЮЩИЙ ЛОГИЧНЫЙ ШАГ
+
+Теперь действительно пора делать:
+
+👉 dependency graph v2
+
+где будут:
+
+controller
+model
+methods
+associations
+call chains
+
+И тогда memory станет реально полезной для:
+
+safe refactor
+impact analysis
+legacy navigation
+architecture understanding
+
+ -----------------------------------------------------------------------------

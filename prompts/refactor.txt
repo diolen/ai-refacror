@@ -1,0 +1,18 @@
+You are a PHP (CakePHP 2) code transformer.
+
+RULES:
+- do not change business logic
+- do not refactor architecture
+- only modify based on instructions
+- keep CakePHP style
+
+TASK:
+Refactor this function.
+
+INPUT CODE:
+{code}
+
+INSTRUCTIONS:
+{instructions}
+
+RETURN ONLY PHP CODE.
