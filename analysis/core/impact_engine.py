@@ -228,4 +228,47 @@ def print_entity_model(entity_model):
             else:
                 print("      (none)")
 
+        print("\n  Timeline:")
+        timeline = data.get("timeline", [])
+        if timeline:
+            for item in timeline:
+                if isinstance(item, dict):
+                    event = item.get("event", "unknown")
+                    count = item.get("count", 0)
+                    print(f"    - {event} ({count})")
+        else:
+            print("    (none)")
+
+        print("\n  Milestones:")
+        milestones = data.get("milestones", [])
+        if milestones:
+            for milestone in milestones:
+                print(f"    - {milestone}")
+        else:
+            print("    (none)")
+
+        print("\n  Decisions:")
+        decisions = data.get("decisions", [])
+        if decisions:
+            for decision in decisions:
+                print(f"    - {decision}")
+        else:
+            print("    (none)")
+
+        print("\n  Insights:")
+        insights = data.get("insights", [])
+        if insights:
+            for insight in insights:
+                print(f"    - {insight}")
+        else:
+            print("    (none)")
+
+        print("\n  Patterns:")
+        patterns = data.get("patterns", [])
+        if patterns:
+            for pattern in patterns:
+                print(f"    - {pattern}")
+        else:
+            print("    (none)")
+
         print("\n" + "-" * 60)

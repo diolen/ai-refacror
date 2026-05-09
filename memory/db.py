@@ -4,6 +4,9 @@ import datetime
 DB_PATH = "memory.db"
 
 
+# =========================
+# CHANGES LOG (без изменений)
+# =========================
 def save_change(
     file,
     function,
@@ -49,12 +52,15 @@ def save_change(
     conn.close()
 
 
+# =========================
+# MEMORY (DEDUP SAFE)
+# =========================
 def save_memory(entry):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
     c.execute("""
-        INSERT INTO memory (
+        INSERT OR IGNORE INTO memory (
             timestamp,
             type,
             text,
@@ -72,6 +78,9 @@ def save_memory(entry):
     conn.close()
 
 
+# =========================
+# WRAPPERS
+# =========================
 def save_milestone(text):
     save_memory({
         "type": "milestone",
@@ -95,19 +104,22 @@ def save_insight(text, confidence=0.8):
         "confidence": confidence
     })
 
+
+# =========================
+# UTILITY
+# =========================
 def memory_exists(text, type_):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
     c.execute("""
-        SELECT id
+        SELECT 1
         FROM memory
         WHERE text = ? AND type = ?
         LIMIT 1
     """, (text, type_))
 
     row = c.fetchone()
-
     conn.close()
 
     return row is not None

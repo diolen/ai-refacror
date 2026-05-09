@@ -279,3 +279,80 @@ associations
 предыдущие данные очистить
 как это восстановим займемся усилением графа
 нового ничего не предлагать
+
+Проверка:
+python cli.py scan ../sic/app/Controller/UsersController.php --adapter cakephp2
+python cli.py impact User ../sic/app/Controller/UsersController.php ../sic/app/Model/User.php --adapter cakephp2
+python cli.py merge ../sic/app/Controller/UsersController.php ../sic/app/Model/User.php --adapter cakephp2
+
+MEMORY (исторические данные)
+Последние записи
+python cli.py memory --last 20
+Полная история (timeline формат)
+python cli.py memory --timeline
+Поиск по истории
+python cli.py memory --search User
+
+Всё что сейчас есть
+scan → зависимости
+impact → анализ сущности
+merge → entity model + enrichment (timeline/milestones/decisions/insights/patterns)
+memory → сохранённая история + вывод в нужном формате
+
+Финальная проверка:
+1. Убедиться что БД существует
+  ls memory.db
+2. Очистить старые данные (важно для чистого теста)
+  1. удалить по ключевому слову
+  python memory/cleanup.py --keyword Auth
+  2. удалить только тип
+  python memory/cleanup.py --type milestone
+  3. удалить ВСЁ (с подтверждением)
+  python memory/cleanup.py --wipe-all
+3. Запустить MERGE (это триггер enrichment)
+  python cli.py merge ../sic/app/Controller/UsersController.php ../sic/app/Model/User.php --adapter cakephp2
+4. Проверить, что данные реально записались
+  python cli.py memory --timeline
+Вариант B — напрямую через sqlite (самый надёжный)
+  sqlite3 memory.db
+  И внутри:
+  SELECT type, text FROM memory ORDER BY id DESC;
+5. Что ты должен увидеть (ожидаемый результат)
+milestone | User reached active dependency usage
+milestone | User reached stable usage
+decision | Filtered framework entities from domain graph
+decision | Normalized self-references in dependencies
+insight | complexity: high
+insight | coupling: medium
+6. Если ничего не появилось — 3 точки проверки
+--------------------------------------------------------------
+
+# =========================
+# ANALYSIS
+# =========================
+
+python cli.py scan ../sic/app/Controller/UsersController.php --adapter cakephp2
+
+python cli.py impact User \
+../sic/app/Controller/UsersController.php \
+../sic/app/Model/User.php \
+--adapter cakephp2
+
+python cli.py merge \
+../sic/app/Controller/UsersController.php \
+../sic/app/Model/User.php \
+--adapter cakephp2
+
+
+# =========================
+# MEMORY
+# =========================
+
+# Последние записи
+python cli.py memory --last 20
+
+# Полная история
+python cli.py memory --timeline
+
+# Поиск по истории
+python cli.py memory --search User

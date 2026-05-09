@@ -5,11 +5,13 @@ from analysis.adapters.cakephp2.association_parser import parse_associations
 from analysis.adapters.cakephp2.graph_builder import build_graph
 
 from analysis.core.entity_model import build_entity_model
+from analysis.core.entity_enricher import enrich_entity_model
 from analysis.core.impact_engine import (
     compute_entity_impact,
     print_impact,
     print_entity_model
 )
+from analysis.core.entity_normalizer import normalize_entity_model
 
 
 # =========================
@@ -55,6 +57,15 @@ def run_impact(args):
         method_graph=method_graph,
     )
 
+    entity_model = normalize_entity_model(entity_model)
+    entity_model = enrich_entity_model(
+        entity_model=entity_model,
+        scan_result=scan_result,
+        method_graph=method_graph
+    )
+
+    print_entity_model(entity_model)
+
     result = compute_entity_impact(entity_name, entity_model)
 
     if result is None:
@@ -97,6 +108,13 @@ def run_merge(args):
         },
         associations=associations,
         method_graph=method_graph
+    )
+
+    entity_model = normalize_entity_model(entity_model)
+    entity_model = enrich_entity_model(
+        entity_model=entity_model,
+        scan_result=scan_result,
+        method_graph=raw_graph
     )
 
     print_entity_model(entity_model)
