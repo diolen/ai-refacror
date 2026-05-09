@@ -107,4 +107,5 @@ architecture understanding
 
  Проверка timeline
  python cli.py memory timeline
+ python cli.py memory patterns
 ------------------------------------------------------------------------------

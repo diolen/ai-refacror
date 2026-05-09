@@ -127,5 +127,28 @@ if __name__ == "__main__":
             for method in methods:
                 print(f"  └── {method}()")
 
+    elif command == "associations":
+        from analysis.association_parser import (
+            parse_associations,
+            extract_association_patterns,
+            save_association_patterns
+        )
+
+        file_path = sys.argv[2]
+        result = parse_associations(file_path)
+        print("\nAssociations:\n")
+        for assoc_type, models in (result["associations"].items()):
+            if not models:
+                continue
+            print(f"{assoc_type}:")
+            for m in models:
+                print(f"  └── {m}")
+            print()
+
+        patterns = extract_association_patterns(result)
+        if patterns:
+            print("Saving patterns...\n")
+            save_association_patterns(patterns)
+
     else:
         print("Unknown command")
