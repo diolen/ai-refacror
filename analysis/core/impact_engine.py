@@ -48,18 +48,25 @@ def compute_entity_impact(entity_name, entity_model):
     score += len(associations.get("hasOne", [])) * WEIGHTS["hasOne"]
     score += len(associations.get("hasAndBelongsToMany", [])) * WEIGHTS["hasAndBelongsToMany"]
 
-    # =========================
-    # CONNECTIVITY
-    # =========================
-    connected_nodes = set(clean_dependencies)
+    # =========================================================
+    # 🧠 NEW CONNECTIVITY MODEL
+    # =========================================================
 
-    for targets in associations.values():
-        if isinstance(targets, list):
-            for t in targets:
-                if isinstance(t, str):
-                    connected_nodes.add(t)
+    dependency_connectivity = len(clean_dependencies)
 
-    connectivity = len(connected_nodes)
+    association_connectivity = 0
+    association_connectivity += len(associations.get("hasMany", [])) * WEIGHTS["hasMany"]
+    association_connectivity += len(associations.get("belongsTo", [])) * WEIGHTS["belongsTo"]
+    association_connectivity += len(associations.get("hasOne", [])) * WEIGHTS["hasOne"]
+    association_connectivity += len(associations.get("hasAndBelongsToMany", [])) * WEIGHTS["hasAndBelongsToMany"]
+
+    behavioral_connectivity = len(methods)
+
+    connectivity = (
+        dependency_connectivity +
+        association_connectivity +
+        behavioral_connectivity
+    )
 
     # =========================
     # NONLINEAR BOOST
@@ -107,13 +114,19 @@ def compute_entity_impact(entity_name, entity_model):
         "dependencies": clean_dependencies,
         "associations": associations,
         "insights": insights,
-        "connectivity": connectivity
+        "connectivity": round(connectivity, 2),
+        "connectivity_breakdown": {
+            "dependency": dependency_connectivity,
+            "association": association_connectivity,
+            "behavioral": behavioral_connectivity
+        }
     }
 
 
 # =========================
-# HUMAN READABLE OUTPUT
+# OUTPUT LAYER (RESTORED API)
 # =========================
+
 def print_impact(result):
 
     if not result:
@@ -128,26 +141,18 @@ def print_impact(result):
     print(f"Connectivity: {result.get('connectivity', 0)}")
 
     print("\nMethods:")
-    if result["methods"]:
-        for m in result["methods"]:
-            print(f"  - {m}")
-    else:
-        print("  (none)")
+    for m in result.get("methods", []):
+        print(f"  - {m}")
 
     print("\nDependencies:")
-    if result["dependencies"]:
-        for d in result["dependencies"]:
-            print(f"  - {d}")
-    else:
-        print("  (none)")
+    for d in result.get("dependencies", []):
+        print(f"  - {d}")
 
     print("\nAssociations:")
-
     assoc = result.get("associations", {})
 
     for key in ["hasMany", "belongsTo", "hasOne", "hasAndBelongsToMany"]:
         print(f"  {key}:")
-
         values = assoc.get(key, [])
         if values:
             for v in values:
@@ -156,13 +161,11 @@ def print_impact(result):
             print("    (none)")
 
     print("\nInsights:")
-    if result["insights"]:
-        for i in result["insights"]:
-            print(f"  • {i}")
-    else:
-        print("  (none)")
+    for i in result.get("insights", []):
+        print(f"  • {i}")
 
     print("\n" + "=" * 60 + "\n")
+
 
 def print_entity_model(entity_model):
 
@@ -178,97 +181,24 @@ def print_entity_model(entity_model):
 
         print(f"\nEntity: {entity_name}")
 
-        # =========================
-        # METHODS
-        # =========================
         print("\n  Methods:")
+        for m in data.get("methods", []):
+            print(f"    - {m}")
 
-        methods = data.get("methods", [])
-
-        if methods:
-            for m in methods:
-                print(f"    - {m}")
-        else:
-            print("    (none)")
-
-        # =========================
-        # DEPENDENCIES
-        # =========================
         print("\n  Dependencies:")
+        for d in data.get("dependencies", []):
+            print(f"    - {d}")
 
-        deps = data.get("dependencies", [])
-
-        if deps:
-            for d in deps:
-                print(f"    - {d}")
-        else:
-            print("    (none)")
-
-        # =========================
-        # ASSOCIATIONS
-        # =========================
         print("\n  Associations:")
-
         assoc = data.get("associations", {})
 
-        for assoc_type in [
-            "hasMany",
-            "belongsTo",
-            "hasOne",
-            "hasAndBelongsToMany"
-        ]:
-
+        for assoc_type in ["hasMany", "belongsTo", "hasOne", "hasAndBelongsToMany"]:
             print(f"\n    {assoc_type}:")
-
             values = assoc.get(assoc_type, [])
-
             if values:
                 for v in values:
                     print(f"      - {v}")
             else:
                 print("      (none)")
-
-        print("\n  Timeline:")
-        timeline = data.get("timeline", [])
-        if timeline:
-            for item in timeline:
-                if isinstance(item, dict):
-                    event = item.get("event", "unknown")
-                    count = item.get("count", 0)
-                    print(f"    - {event} ({count})")
-        else:
-            print("    (none)")
-
-        print("\n  Milestones:")
-        milestones = data.get("milestones", [])
-        if milestones:
-            for milestone in milestones:
-                print(f"    - {milestone}")
-        else:
-            print("    (none)")
-
-        print("\n  Decisions:")
-        decisions = data.get("decisions", [])
-        if decisions:
-            for decision in decisions:
-                print(f"    - {decision}")
-        else:
-            print("    (none)")
-
-        print("\n  Insights:")
-        insights = data.get("insights", [])
-        if insights:
-            for insight in insights:
-                print(f"    - {insight}")
-        else:
-            print("    (none)")
-
-        print("\n  Patterns:")
-        patterns = data.get("patterns", [])
-        if patterns:
-            for pattern in patterns:
-                print(f"    - {pattern}")
-        else:
-            print("    (none)")
 
         print("\n" + "-" * 60)
