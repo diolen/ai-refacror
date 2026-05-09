@@ -150,5 +150,30 @@ if __name__ == "__main__":
             print("Saving patterns...\n")
             save_association_patterns(patterns)
 
+    elif command == "merge":
+        from analysis.merge_engine import (
+            merge_graphs
+        )
+        controller_file = sys.argv[2]
+        model_files = sys.argv[3:]
+        result = merge_graphs(
+            controller_file,
+            model_files
+        )
+        print("\nMerged Graph:\n")
+        for model, data in (result["models"].items()):
+            print(model)
+            # methods
+            for method in data["methods"]:
+                print(f"  ├── {method}()")
+            # associations
+            for assoc_type, targets in (data["associations"].items()):
+                if not targets:
+                    continue
+                print(f"  ├── {assoc_type}")
+                for t in targets:
+                    print(f"  │     └── {t}")
+            print()
+
     else:
         print("Unknown command")

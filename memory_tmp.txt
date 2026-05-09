@@ -108,4 +108,9 @@ architecture understanding
  Проверка timeline
  python cli.py memory timeline
  python cli.py memory patterns
+
+Merge graph and associations
+ python cli.py merge \
+../sic/app/Controller/UsersController.php \
+../sic/app/Model/User.php
 ------------------------------------------------------------------------------
