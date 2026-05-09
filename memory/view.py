@@ -102,27 +102,22 @@ def show_memory(limit=20):
 def show_timeline():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-
     c.execute("""
         SELECT
+            id,
             timestamp,
             type,
             text
         FROM memory
-        ORDER BY timestamp ASC
+        ORDER BY id ASC
     """)
 
     rows = c.fetchall()
-
     current_day = None
-
     for r in rows:
-        day = r[0][:10]
-
+        day = r[1][:10]
         if day != current_day:
             current_day = day
             print(f"\n=== {day} ===")
-
-        print(f"[{r[1]}] {r[2]}")
-
+        print(f"[{r[2]}] {r[3]}")
     conn.close()

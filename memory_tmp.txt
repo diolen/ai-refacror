@@ -109,8 +109,173 @@ architecture understanding
  python cli.py memory timeline
  python cli.py memory patterns
 
+ python cli.py scan ../sic/app/Controller/UsersController.php
+
 Merge graph and associations
  python cli.py merge \
 ../sic/app/Controller/UsersController.php \
 ../sic/app/Model/User.php
+
+python cli.py impact \
+User \
+../sic/app/Controller/UsersController.php \
+../sic/app/Model/User.php
+
 ------------------------------------------------------------------------------
+
+Что у тебя уже получилось
+
+Ты фактически собрал:
+
+1. Timeline (история изменений)
+milestones
+decisions
+insights
+patterns
+associations
+
+2. Architecture evolution trace
+graph v1 → v2
+memory system evolution
+impact engine добавлен
+
+3. Domain knowledge
+User coupling
+UsersOperationUnit business logic
+CRUD-heavy model behavior
+------------------------------------------------------------------------------
+
+СОХРАНЯЮ ДЛЯ ТОГО ЧТОБЫ ЗНАТЬ ЧТО ДЕЛАТЬ ДАЛЬШЕ
+НА СЛЕДУЮЩЕМ ЭТАПЕ УДАЛИТЬ ЭТОТ БЛОК
+
+🚀 Итог
+
+✔ Да — твоя история уже достаточна
+✔ Да — можно восстановить проект
+⚠ Но это ещё не self-describing system
+🔥 Следующий шаг — добавить snapshot + versioning memory
+
+🚀 Если идти дальше правильно
+
+Следующий эволюционный шаг будет:
+
+👉 “queryable architecture memory”
+
+где ты сможешь писать:
+
+impact User
+why is this risky?
+what changed since last scan?
+
+и система сама будет отвечать.
+
+Если хочешь, дальше можно сделать именно это — и это уже будет уровень “mini internal static analysis tool like PHPStan + architecture memory”.
+
+--------------------------------------------------------------------------------------------
+
+=== 2026-05-09 ===
+[milestone] Adapter-based architecture introduced for framework-specific analysis
+[milestone] CakePHP 2 adapter layer implemented under analysis/adapters/cakephp2
+[milestone] Dependency scanner isolated into framework adapter layer
+[milestone] Association parser isolated into framework adapter layer
+[milestone] Graph builder isolated into framework adapter layer
+[milestone] CLI command dispatcher fully restored and stabilized
+[milestone] scan command fixed after missing main entrypoint issue
+[milestone] Human-readable impact output implemented via print_impact()
+[milestone] Frequency-aware dependency scanner implemented
+[milestone] Method call frequency tracking added to dependency analysis
+[milestone] Unified entity normalization layer implemented
+[milestone] Framework/helper filtering improved for entity purity
+[milestone] Graph builder normalized into domain/framework separation
+[milestone] Connectivity-aware impact scoring implemented
+[milestone] Business-method heuristics integrated into impact analysis
+[milestone] Nonlinear refactor risk scoring implemented
+[milestone] Aggregation root detection heuristics implemented
+[milestone] Dependency deduplication added to impact engine
+[milestone] Association normalization pipeline stabilized
+[milestone] CakePHP CRLF controller parsing issue resolved
+[milestone] Controller method extraction stabilized for legacy CakePHP 2 codebase
+[decision] Core analysis engine separated from framework-specific parsing logic
+[decision] Adapter pattern selected to support future multi-framework analysis
+[decision] Entity model and impact engine designed as framework-agnostic core
+[decision] Impact output standardized to human-readable CLI format instead of JSON
+[decision] Entity analysis pipeline unified around entity_model abstraction
+[decision] Dependency frequency preserved as architectural signal
+[decision] Framework entities excluded from domain connectivity calculations
+[decision] Connectivity scoring treated as first-class architectural metric
+[decision] merge command deprioritized in favor of entity_model pipeline
+[insight] Adapter isolation significantly reduces coupling between parsing and analysis layers
+[insight] Framework-specific extraction logic evolves independently from core intelligence layer
+[insight] Legacy CakePHP controllers contain repeated model interaction patterns
+[insight] Method frequency is a strong indicator of business-critical coupling
+[insight] User entity qualifies as critical refactor-risk domain node
+[insight] Connectivity + behavioral heuristics produce more realistic impact estimation
+[insight] Human-readable CLI output significantly improves architectural debugging
+[insight] Self-dependency noise can distort domain impact scoring
+[pattern] User frequently interacts with UsersOperationUnit and Center domain structures
+[pattern] Authentication-related framework calls dominate controller interaction volume
+
+
+Да, это уже типичная стадия архитектурного перехода.
+
+Ты сейчас сделал большой structural refactor:
+
+* вынес framework-specific logic в adapters
+* ввел unified entity model
+* поменял pipeline данных
+* поменял формат dependency graph
+* начал делать framework-agnostic core
+
+После таких изменений почти всегда временно ломаются:
+
+* timeline
+* memory aggregation
+* merge
+* pattern history
+* backward compatibility
+* CLI consistency
+* serialization contracts
+
+Это нормально.
+
+Завтра логично сделать не новые фичи, а stabilization pass:
+
+1. восстановить timeline
+2. проверить memory compatibility
+3. проверить merge
+4. унифицировать contracts между adapters/core
+5. убрать debug artifacts
+6. сделать единый output layer
+7. восстановить backward compatibility
+8. проверить старые команды на новой архитектуре
+9. сделать smoke-test matrix для CLI
+
+У тебя сейчас главная задача не расширять систему, а зафиксировать архитектурный фундамент, чтобы дальше не вязнуть в regressions.
+------------------------------------------------------------------------------
+
+2026-05-09
+небольшая попрвака
+1. def run_impact(args), def run_scan(args) и def run_merge(args) перенести в adapter/cakephp2
+2. в cli.py добавить разделитель для adapter(cakephp2, cakephp3, cakephp4)
+3. нового ничего не предлагать
+
+после переноса проверить если все работает нового ничего не предлагать
+
+python cli.py scan ../sic/app/Controller/UsersController.php --adapter cakephp2
+python cli.py impact User ../sic/app/Controller/UsersController.php ../sic/app/Model/User.php --adapter cakephp2
+python cli.py merge ../sic/app/Controller/UsersController.php ../sic/app/Model/User.php --adapter cakephp2
+
+все работает
+
+---
+
+Восстановить работу:
+Timeline (история изменений)
+milestones
+decisions
+insights
+patterns
+associations
+предыдущие данные очистить
+как это восстановим займемся усилением графа
+нового ничего не предлагать
