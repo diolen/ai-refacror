@@ -17,7 +17,12 @@ from analysis.core.entity_model import (
 from analysis.core.entity_normalizer import (
     normalize_entity_model
 )
+
 from analysis.core.entity_enricher import enrich_entity_model
+
+from analysis.core.dependency_propagation_engine import (
+    propagate_dependencies
+)
 
 
 def analyze_file(controller_file, model_file):
@@ -47,8 +52,15 @@ def analyze_file(controller_file, model_file):
 
     entity_model = normalize_entity_model(entity_model)
 
-    return enrich_entity_model(
+    entity_model = enrich_entity_model(
         entity_model=entity_model,
         scan_result=dependency_graph,
         method_graph=method_graph
     )
+
+    # =========================
+    # DEPENDENCY PROPAGATION LAYER (NEW)
+    # =========================
+    entity_model = propagate_dependencies(entity_model)
+
+    return entity_model
