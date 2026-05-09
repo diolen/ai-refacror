@@ -15,6 +15,16 @@ from analysis.core.entity_normalizer import normalize_entity_model
 
 
 # =========================
+# PROMPT BUILDER (NEW)
+# =========================
+from analysis.core.prompt_builder.entity_prompt import EntityPrompt
+from analysis.core.prompt_builder.impact_prompt import ImpactPrompt
+from analysis.core.prompt_builder.refactor_prompt import RefactorPrompt
+from analysis.core.prompt_builder.prompt_renderer import render_prompt
+from analysis.core.prompt_builder.prompt_context import PromptContext
+
+
+# =========================
 # SCAN
 # =========================
 def run_scan(args):
@@ -51,6 +61,9 @@ def run_impact(args):
 
     method_graph = build_graph(controller_file).get("domain", {})
 
+    # =========================
+    # BUILD ENTITY MODEL
+    # =========================
     entity_model = build_entity_model(
         dependency_graph=dependency_graph,
         associations=associations,
@@ -66,6 +79,9 @@ def run_impact(args):
 
     print_entity_model(entity_model)
 
+    # =========================
+    # IMPACT CALCULATION
+    # =========================
     result = compute_entity_impact(entity_name, entity_model)
 
     if result is None:
@@ -76,6 +92,30 @@ def run_impact(args):
         return 1
 
     print_impact(result)
+
+    # =========================
+    # PROMPT BUILDER INTEGRATION (NEW)
+    # =========================
+    context = PromptContext()
+
+    context.update(
+        impact_score=result.get("score"),
+        connectivity=result.get("connectivity"),
+        insights=result.get("insights", [])
+    )
+
+    impact_prompt = ImpactPrompt(
+        entity_model=entity_model,
+        context=context.get()
+    )
+
+    prompt = impact_prompt.build(entity_name)
+
+    print("\n" + "=" * 60)
+    print("LLM PROMPT (IMPACT)")
+    print("=" * 60)
+    print(render_prompt(prompt))
+    print("=" * 60 + "\n")
 
     return 0
 
@@ -118,5 +158,19 @@ def run_merge(args):
     )
 
     print_entity_model(entity_model)
+
+    # =========================
+    # PROMPT BUILDER (MERGE MODE)
+    # =========================
+    context = PromptContext()
+
+    entity_prompt = EntityPrompt(entity_model)
+    prompt = entity_prompt.build()
+
+    print("\n" + "=" * 60)
+    print("LLM PROMPT (ENTITY MODEL)")
+    print("=" * 60)
+    print(render_prompt(prompt))
+    print("=" * 60 + "\n")
 
     return 0
