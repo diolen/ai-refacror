@@ -3,7 +3,8 @@ import argparse
 from analysis.adapters.cakephp2.runner import (
     run_scan,
     run_impact,
-    run_merge
+    run_merge,
+    run_prompt
 )
 
 from memory.view import (
@@ -30,7 +31,9 @@ def main():
     # SCAN
     # =========================
     scan = sub.add_parser("scan")
+
     scan.add_argument("file")
+
     scan.add_argument(
         "--adapter",
         choices=["cakephp2", "cakephp3", "cakephp4"],
@@ -41,9 +44,11 @@ def main():
     # IMPACT
     # =========================
     impact = sub.add_parser("impact")
+
     impact.add_argument("entity")
     impact.add_argument("controller")
     impact.add_argument("model")
+
     impact.add_argument(
         "--adapter",
         choices=["cakephp2", "cakephp3", "cakephp4"],
@@ -54,8 +59,10 @@ def main():
     # MERGE
     # =========================
     merge = sub.add_parser("merge")
+
     merge.add_argument("controller")
     merge.add_argument("model")
+
     merge.add_argument(
         "--adapter",
         choices=["cakephp2", "cakephp3", "cakephp4"],
@@ -63,7 +70,28 @@ def main():
     )
 
     # =========================
-    # MEMORY (HISTORY VIEW)
+    # PROMPT
+    # =========================
+    prompt = sub.add_parser("prompt")
+
+    prompt.add_argument("entity")
+    prompt.add_argument("controller")
+    prompt.add_argument("model")
+
+    prompt.add_argument(
+        "--mode",
+        choices=["impact", "refactor"],
+        default="impact"
+    )
+
+    prompt.add_argument(
+        "--adapter",
+        choices=["cakephp2", "cakephp3", "cakephp4"],
+        default="cakephp2"
+    )
+
+    # =========================
+    # MEMORY
     # =========================
     mem = sub.add_parser("memory")
 
@@ -86,6 +114,9 @@ def main():
 
         if args.command == "merge":
             return run_merge(args)
+
+        if args.command == "prompt":
+            return run_prompt(args)
 
         if args.command == "memory":
 

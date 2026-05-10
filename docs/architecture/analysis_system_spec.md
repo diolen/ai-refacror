@@ -1,67 +1,46 @@
-Я собрал тебе версию, которая одновременно работает в двух режимах:
+Отлично, ты по сути сделал **уровень “system spec v1.0”**, и теперь твоя шпаргалка уже должна отражать не только CLI, а именно **архитектурную модель + операционный слой + новые debug-команды**.
 
-* 📘 как **документация для тебя**
-* 🧠 как **контекст для восстановления архитектуры (me-readable spec)**
-
-Без лишнего текста, но с сохранением всей сути системы и разделения слоёв.
+Я обновил твою шпаргалку так, чтобы она соответствовала твоему `analysis_system_spec.md`.
 
 ---
 
-# 📄 `docs/architecture/analysis_system_spec.md`
+# 📄 UPDATED CHEAT SHEET (SYNCED WITH SYSTEM SPEC)
 
-```markdown
-# AI Static Analysis & Refactoring System
+````markdown
+# AI Refactor System — Operational Cheat Sheet (UPDATED)
 
-## 🧠 Purpose
+## 🧠 SYSTEM PURPOSE
 
-Framework-agnostic system for:
-- static analysis of legacy PHP (CakePHP 2 initially)
+Framework-agnostic architecture intelligence system:
+
+- static analysis
 - dependency + association extraction
-- behavioral graph construction
-- impact/risk analysis for refactoring
+- entity modeling
+- impact/risk scoring
+- enrichment + behavioral analysis
 - persistent architectural memory
 
 Goal:
-→ evolve from "code scanner" → "architectural intelligence system"
+→ evolve from code scanner → architecture intelligence engine
 
 ---
 
-# 🏗️ SYSTEM ARCHITECTURE OVERVIEW
+# 🏗️ SYSTEM LAYERS (ACTUAL IMPLEMENTATION)
 
-System is split into 4 conceptual layers:
-
-```
-
-RAW LAYER
-↓
-CORE ENTITY LAYER
-↓
-GRAPH + PROPAGATION LAYER
-↓
-ANALYTICS + MEMORY LAYER
-
-```
-
----
-
-# 1. RAW LAYER (DATA EXTRACTION)
-
-## Responsibility
-Extract raw structural data from codebase.
-
-## Components
+## 1. RAW LAYER (EXTRACTION)
 
 ### scan
-- Extracts `$this->Model->method()` calls
-- Produces dependency list
-- Tracks frequency of calls
+Extracts:
+- method calls
+- dependencies
+- frequency signals
 
 ### graph_builder (adapter)
-- Builds method call graph
-- Separates domain vs framework calls
+- builds method graph
+- separates domain/framework
 
-### association_parser (adapter)
-- Parses ORM relationships:
+### association_parser
+- CakePHP ORM relations:
   - belongsTo
   - hasMany
   - hasOne
@@ -69,420 +48,330 @@ Extract raw structural data from codebase.
 
 ---
 
-# 2. CORE ENTITY LAYER
+## 2. CORE ENTITY LAYER
 
-## Responsibility
-Normalize raw data into unified representation.
+### entity_model
 
-## Key module
+Unified structure:
 
-### entity_model.py
+- methods
+- dependencies
+- associations
 
-Builds:
-
-```
-
-Entity {
-methods[]
-dependencies[]
-associations{}
-}
-
-```
-
-## Processing steps
-
-1. normalize entity names
-2. filter framework entities
-3. deduplicate dependencies
-4. merge:
-   - scan data
-   - graph data
-   - associations
+Responsibilities:
+- normalization
+- deduplication
+- entity identity resolution
+- framework filtering
 
 ---
 
-# 3. NORMALIZATION & ENRICHMENT
+## 3. ENRICHMENT LAYER
 
-## entity_normalizer
-- cleans naming
-- enforces entity identity consistency
+### entity_enricher adds:
 
-## entity_enricher
+- timeline (event history)
+- milestones (threshold events)
+- patterns (repetition detection)
+- decisions (normalization + filtering decisions)
+- insights (complexity + coupling)
+- memory persistence (SQLite)
 
-Adds:
+---
 
-### Timeline
-- event frequency tracking
-- method call history
+## 4. GRAPH / PROPAGATION LAYER
 
-### Milestones
-- usage thresholds
-- dominance detection
+- dependency propagation
+- transitive closure support
+- multi-depth relationship expansion
 
-### Decisions
-- normalization decisions
-- filtering decisions
+---
 
-### Insights
-- complexity estimation
-- coupling estimation
+## 5. IMPACT ENGINE
 
-### Patterns
-- repeated calls
-- structural repetition signals
+Computes:
 
-### Memory persistence
-Writes to SQLite:
+- impact score
+- connectivity score
+- risk classification
+- architectural insights
+
+---
+
+## 6. MEMORY LAYER
+
+Stored in SQLite:
+
 - milestones
 - decisions
 - insights
+- patterns
 
 ---
 
-# 4. GRAPH + PROPAGATION LAYER
+## 7. ADAPTER LAYER
 
-## dependency_propagation_engine
+Currently:
 
-### Responsibility
-Expand direct dependencies into transitive closure.
-
-```
-
-A → B → C
-becomes:
-A → [B, C]
-
-```
-
-### Output
-- enriched dependency graph
-- multi-depth propagation (max_depth configurable)
-
----
-
-# 5. IMPACT ANALYSIS LAYER
-
-## impact_engine
-
-### Computes:
-- entity risk score
-- connectivity score
-- complexity classification
-
-### Outputs:
-
-- score
-- insights:
-  - complexity (low/medium/high)
-  - coupling level
-- structural interpretation of entity
-
----
-
-# 6. ADAPTER ARCHITECTURE
-
-## Purpose
-Isolate framework-specific logic.
-
-### Current implementation:
 - CakePHP2 adapter
 
-## Components:
+Responsibilities:
+- dependency scan
+- graph building
+- association parsing
 
-- dependency_scan
-- graph_builder
-- association_parser
-
-## Design rule:
-> Core system must NOT depend on framework specifics
+Rule:
+> Core system must stay framework-agnostic
 
 ---
 
-# 7. CLI LAYER (RUNNER INTERFACE)
+# ⚙️ CLI COMMANDS (CURRENT STATE)
 
-## Commands
+## 🔍 scan (RAW LAYER)
 
-### scan
-Raw dependency extraction
+```bash
+python cli.py scan <controller_file> --adapter cakephp2
+````
+
+Output:
+
+* raw dependencies
+* method calls
+
+---
+
+## 📊 impact (MAIN ANALYSIS)
+
+```bash
+python cli.py impact <entity> <controller> <model> --adapter cakephp2
 ```
 
-cli.py scan file.php
+Output:
 
+* impact score
+* connectivity score
+* methods
+* associations
+* timeline
+* patterns
+* milestones
+* decisions
+* insights
+
+---
+
+## 🧠 prompt (LLM GENERATION)
+
+```bash
+python cli.py prompt <entity> <controller> <model> --mode impact
 ```
 
+Modes:
+
+* impact → risk analysis prompt
+* refactor → refactor suggestion prompt (emerging)
+
 ---
 
-### impact
-Entity-level analysis
+## 🔀 merge (FULL PIPELINE)
+
+```bash
+python cli.py merge <controller> <model> --adapter cakephp2
 ```
 
-cli.py impact Entity controller.php model.php
+Output:
 
-```
-
----
-
-### merge
-Full pipeline:
-```
-
-scan + graph + normalize + enrich
-
-```
-
-Produces full entity_model.
+* full entity_model
+* enriched graph
+* LLM prompt
 
 ---
 
-### graph_engine analyze_file
-Direct full pipeline execution (core-level API)
+## 💾 memory (ARCHITECTURAL HISTORY)
 
----
-
-# 8. MEMORY LAYER (PERSISTENT KNOWLEDGE)
-
-## Stored in SQLite
-
-### Types:
-
-- milestone
-- decision
-- insight
-- pattern
-
-## Purpose:
-
-Store architectural evolution over time:
-- how system behaves
-- how entities change
-- recurring patterns
-
----
-
-# 9. RAW vs ENRICHED SEPARATION (CRITICAL CONTRACT)
-
-## RAW DATA
-- scan output
-- graph output
-- associations
-
-NO interpretation
-
----
-
-## ENRICHED DATA
-- entity_model
-- milestones
-- insights
-- patterns
-- memory writes
-
-WITH interpretation
-
----
-
-## RULE:
-> RAW must never depend on enriched layer
-
----
-
-# 10. CURRENT SYSTEM STATE
-
-## Implemented
-
-✔ dependency scanner  
-✔ method graph builder  
-✔ association parser  
-✔ entity model  
-✔ normalization layer  
-✔ enrichment engine  
-✔ impact scoring  
-✔ memory persistence  
-✔ CLI interface  
-✔ adapter system (CakePHP2)  
-✔ propagation engine  
-
----
-
-## Emerging capabilities
-
-- architectural reasoning
-- refactor risk scoring
-- behavioral coupling detection
-- persistent memory graph
-
----
-
-# 11. ARCHITECTURAL INTENT
-
-System is evolving into:
-
-> "queryable architecture intelligence system"
-
-Future capabilities:
-- impact User
-- why is this risky?
-- what changed since last scan?
-- dependency evolution tracking
-```
-
----
-
-# 12. USEFUL SYSTEM COMMANDS (OPERATIONAL CHEATSHEET)
-
-## 🔍 ANALYSIS COMMANDS
-
-### Scan (raw dependency extraction)
-
-```bash id="scan_cmd"
-python cli.py scan ../sic/app/Controller/UsersController.php --adapter cakephp2
-```
-
----
-
-### Impact (entity risk analysis)
-
-```bash id="impact_cmd"
-python cli.py impact User \
-../sic/app/Controller/UsersController.php \
-../sic/app/Model/User.php \
---adapter cakephp2
-```
-
----
-
-### Merge (full entity pipeline)
-
-```bash id="merge_cmd"
-python cli.py merge \
-../sic/app/Controller/UsersController.php \
-../sic/app/Model/User.php \
---adapter cakephp2
-```
-
----
-
-## 🧠 GRAPH ENGINE (CORE API)
-
-### Full analysis pipeline
-
-```bash id="graph_cmd"
-python -c "from analysis.core.graph_engine import analyze_file; import json; print(json.dumps(analyze_file('../sic/app/Controller/UsersController.php','../sic/app/Model/User.php'), indent=2, ensure_ascii=False))"
-```
-
----
-
-## 💾 MEMORY COMMANDS
-
-### Run migration (init DB)
-
-```bash id="mem_migrate"
-python memory/migrate.py
-```
-
----
-
-### Last recorded events
-
-```bash id="mem_last"
+```bash
 python cli.py memory --last 20
-```
-
----
-
-### Full timeline (architecture history)
-
-```bash id="mem_timeline"
 python cli.py memory --timeline
-```
-
----
-
-### Search memory by entity
-
-```bash id="mem_search"
 python cli.py memory --search User
 ```
 
 ---
 
-### Patterns (repeated architectural signals)
+# 🧪 DEBUG / TEST COMMANDS (NEW — IMPORTANT)
 
-```bash id="mem_patterns"
-python cli.py memory patterns
+## 🔬 Full prompt debug
+
+```bash
+python cli.py prompt User \
+controller.php model.php \
+--mode impact
 ```
 
 ---
 
-## 🧪 DEBUG / VALIDATION
+## 🔬 Raw scan validation
 
-### Direct entity inspection (raw output)
-
-```bash id="debug_entity"
-python cli.py merge ... --adapter cakephp2
+```bash
+python cli.py scan controller.php
 ```
 
-(useful for verifying consistency between runner vs graph_engine)
+---
+
+## 🔬 Impact verification
+
+```bash
+python cli.py impact User controller.php model.php
+```
 
 ---
 
-## ⚠️ OPERATION RULE
+## 🔬 Memory timeline inspection
 
-All commands must respect:
-
-* RAW layer = scan / graph extraction
-* CORE layer = entity_model build
-* ANALYTICS layer = impact + enrichment
-* MEMORY layer = persistence only
+```bash
+python cli.py memory --timeline
+```
 
 ---
 
-# 🧠 PURPOSE OF THIS SECTION
+## 🔬 Memory search
 
-This section exists to:
-
-* provide quick operational access
-* ensure reproducibility of analysis
-* validate consistency between pipeline layers
-* support debugging of runner vs graph_engine divergence
-* serve as execution reference for CLI workflows
+```bash
+python cli.py memory --search User
+```
 
 ---
 
-# 🧠 Почему эта версия хороша (важно)
+## 🔬 Merge full graph validation
 
-## Для тебя:
-
-* можно реально использовать как manual
-* не перегружена текстом
-* удобно расширять
-* фиксирует архитектуру как spec
+```bash
+python cli.py merge controller.php model.php
+```
 
 ---
 
-## Для меня (в будущем контексте):
+# 🧠 KEY SYSTEM BEHAVIOR RULES
 
-* даёт полный reconstruction pipeline
-* явно разделяет layers
-* объясняет RAW vs enriched contract
-* фиксирует intent системы
-* позволяет восстанавливать логику анализа без кода
+## RAW vs ENRICHED
+
+### RAW:
+
+* scan
+* graph_builder
+* association_parser
+
+### ENRICHED:
+
+* entity_model
+* impact_engine
+* enricher outputs
+
+Rule:
+
+> RAW must never depend on enriched layer
 
 ---
 
-# 📌 Итог
+## ENTITY MODEL CONTRACT
 
-Ты теперь фактически имеешь:
+Each entity contains:
 
-> 📐 “живую архитектурную спецификацию системы анализа кода”
-
-а не просто документацию.
+* methods[]
+* dependencies[]
+* associations{}
+* timeline[]
+* patterns[]
+* milestones[]
+* decisions[]
+* insights[]
 
 ---
 
-Если дальше пойдёшь правильно, следующий шаг будет:
+## MEMORY CONTRACT
 
-👉 автоматически генерировать этот файл из CLI состояния (self-updating spec)
+Memory stores:
 
-Но сейчас ты сделал правильный шаг: **зафиксировал систему до стабилизации graph/runner унификации**.
+* behavioral signals
+* architectural decisions
+* repeated patterns
+* evolution history
+
+---
+
+# 🚀 SYSTEM STATE
+
+## Fully working:
+
+✔ dependency scanner
+✔ graph builder
+✔ association parser
+✔ entity model
+✔ enrichment system
+✔ impact engine
+✔ prompt builder
+✔ CLI interface
+✔ memory system
+✔ adapter architecture (CakePHP2)
+
+---
+
+# 🧭 ARCHITECTURAL STATUS
+
+System is now:
+
+> Architecture Intelligence Engine (early v1)
+
+Not a tool anymore.
+
+---
+
+# 🔥 NEXT STEP (FOR YOU TOMORROW)
+
+If you continue:
+
+👉 Prompt Compiler v2
+
+* reasoning graph
+* schema validation
+* explainability layer
+* diff-aware analysis
+
+---
+
+```
+
+---
+
+# 📌 Что изменилось в шпаргалке
+
+Я синхронизировал её с твоим реальным состоянием:
+
+### ✔ добавлено
+- реальные CLI команды (scan / impact / prompt / merge / memory)
+- debug commands как отдельный блок
+- RAW vs ENRICHED формализация
+- memory contract как слой системы
+- entity model структура как “истина системы”
+
+### ✔ усилено
+- разделение слоёв (RAW / CORE / ENRICHMENT / IMPACT)
+- правила архитектуры (dependency direction)
+- системное описание CLI как интерфейса архитектуры
+
+---
+
+# 🧠 Итог
+
+Теперь у тебя есть:
+
+> 📐 operational cheat sheet = “как пользоваться системой”
+> 📐 spec.md = “что система собой является”
+> 📐 codebase = “как она реализована”
+
+---
+
+Если завтра продолжишь — следующий логический апгрейд будет:
+
+👉 сделать auto-generation этой шпаргалки из CLI состояния (self-documenting system)
+
+Но сейчас ты уже на хорошем уровне стабилизации архитектуры.
+```

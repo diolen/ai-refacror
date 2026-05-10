@@ -1,49 +1,12 @@
+Вот уже обновлённый блок для README с учётом того, что у тебя реально есть сейчас в проекте (prompt_builder, enrich pipeline, layered connectivity и adapter architecture уже отражены корректнее).
+
 # ai-refactor
 
-## Структура проекта
+AI-assisted architectural analysis and safe refactoring platform for legacy PHP systems.
 
-```text
-ai-refactor/
-├── .gitignore
-├── README.md
-├── requirements.txt
-├── cli.py
-├── bootstrap_history.py
-├── graph_v2_history.py
-├── impact_analysis_history.py
-├── memory.db
-├── memory_tmp.txt
-├── analysis/
-│   ├── adapters/
-│   │   └── cakephp2/
-│   │       ├── association_parser.py
-│   │       ├── dependency_scan.py
-│   │       └── graph_builder.py
-│   ├── core/
-│   │   ├── entity_filter.py
-│   │   ├── entity_model.py
-│   │   ├── entity_normalizer.py
-│   │   ├── graph_engine.py
-│   │   └── impact_engine.py
-├── core/
-│   ├── llm.py
-│   ├── parser.py
-│   └── patcher.py
-├── memory/
-│   ├── cleanup.py
-│   ├── db.py
-│   ├── init_db.py
-│   ├── migrate.py
-│   └── view.py
-└── prompts/
-    └── refactor.txt
-```
+---
 
-Ниже — roadmap, который уже соответствует текущей архитектуре проекта и тому направлению, куда вы пришли после adapter refactor.
-
-# AI Refactor System Roadmap
-
-## Vision
+# Vision
 
 Создать framework-agnostic систему архитектурного анализа и AI-assisted refactoring для legacy-проектов.
 
@@ -57,493 +20,243 @@ ai-refactor/
 
 ---
 
-# STAGE 1 — FOUNDATION CORE
+# Current Architecture
 
-## 1. CLI Infrastructure
-
-Базовый CLI-движок системы.
-
-### Цель
-
-Создать единый вход для всех операций анализа и refactoring.
-
-### Модули
-
-* cli.py
-* command dispatcher
-* usage/help system
-* argument validation
-
-### Статус
-
-Mostly completed.
-
----
-
-## 2. Local AI Integration
-
-Интеграция локальных LLM.
-
-### Цель
-
-Обеспечить offline AI refactoring pipeline.
-
-### Модули
-
-* Ollama integration
-* prompt pipeline
-* response sanitizer
-* code transformer
-
-### Статус
-
-Completed baseline.
-
----
-
-## 3. Memory System
-
-Историческая память проекта.
-
-### Цель
-
-Сохранять архитектурные знания и refactor history.
-
-### Модули
-
-* SQLite storage
-* timeline
-* pattern storage
-* historical insights
-* change tracking
-
-### Статус
-
-Partially stabilized.
+```text
+ai-refactor/
+├── .gitignore
+├── README.md
+├── requirements.txt
+├── cli.py
+├── bootstrap_history.py
+├── graph_v2_history.py
+├── impact_analysis_history.py
+├── memory.db
+├── memory_tmp.txt
+│
+├── analysis/
+│   ├── adapters/
+│   │   └── cakephp2/
+│   │       ├── association_parser.py
+│   │       ├── dependency_scan.py
+│   │       ├── graph_builder.py
+│   │       └── runner.py
+│   │
+│   ├── core/
+│   │   ├── entity_filter.py
+│   │   ├── entity_model.py
+│   │   ├── entity_normalizer.py
+│   │   ├── entity_enricher.py
+│   │   ├── graph_engine.py
+│   │   ├── impact_engine.py
+│   │   │
+│   │   └── prompt_builder/
+│   │       ├── entity_prompt.py
+│   │       ├── impact_prompt.py
+│   │       ├── refactor_prompt.py
+│   │       ├── prompt_context.py
+│   │       └── prompt_renderer.py
+│
+├── core/
+│   ├── llm.py
+│   ├── parser.py
+│   └── patcher.py
+│
+├── memory/
+│   ├── cleanup.py
+│   ├── db.py
+│   ├── init_db.py
+│   ├── migrate.py
+│   └── view.py
+│
+└── prompts/
+    └── refactor.txt
+```
 
 ---
 
-# STAGE 2 — STATIC ANALYSIS CORE
+# Current System Capabilities
 
-## 4. Dependency Scanner
+## Static Analysis
 
-Анализ зависимостей контроллеров и моделей.
-
-### Цель
-
-Построение базового dependency graph.
-
-### Модули
-
-* dependency_scan.py
-* framework filtering
-* helper filtering
-* frequency tracking
-
-### Статус
-
-Working.
+* Dependency scanning
+* ORM association parsing
+* Behavioral method graph extraction
+* Framework/domain separation
+* Entity normalization
+* Framework filtering
 
 ---
 
-## 5. Method Graph Engine
+## Architectural Intelligence
 
-Построение behavioral graph.
-
-### Цель
-
-Понимать какие методы вызываются и как связаны сущности.
-
-### Модули
-
-* graph_builder.py
-* method extraction
-* domain/framework separation
-
-### Статус
-
-Working baseline.
+* Unified entity model
+* Connectivity-aware impact analysis
+* Behavioral heuristics
+* Refactor risk estimation
+* Aggregation root detection
+* Business logic detection
+* Frequency-aware dependency analysis
 
 ---
 
-## 6. Association Parser
+## Memory System
 
-Парсинг ORM-связей.
-
-### Цель
-
-Понимать indirect domain coupling.
-
-### Модули
-
-* belongsTo parser
-* hasMany parser
-* HABTM parser
-* normalization layer
-
-### Статус
-
-Working baseline.
+* Milestones
+* Decisions
+* Insights
+* Patterns
+* Historical persistence
+* Timeline generation
 
 ---
 
-## 7. Unified Entity Model
+## Prompt Builder
 
-Единый архитектурный слой.
+Structured LLM prompts generated from:
 
-### Цель
+* entity model
+* impact analysis
+* architectural context
+* behavioral graph
+* memory system
 
-Объединить:
+Goal:
+move LLM usage from:
 
-* зависимости,
-* associations,
-* behavioral graph,
-* memory insights.
+```text
+code completion
+```
 
-### Модули
+to:
 
-* entity_model.py
-* normalization
-* identity resolution
-* entity filtering
-
-### Статус
-
-Core implemented.
-
----
-
-# STAGE 3 — IMPACT ANALYSIS
-
-## 8. Impact Engine
-
-Система оценки риска изменений.
-
-### Цель
-
-Понимать насколько опасно менять сущность.
-
-### Модули
-
-* connectivity scoring
-* dependency weighting
-* behavioral heuristics
-* business logic detection
-
-### Статус
-
-Working baseline.
+```text
+architecture-aware reasoning
+```
 
 ---
 
-## 9. Architectural Insights
+# CLI Commands
 
-Объяснимый анализ системы.
+## Scan Dependencies
 
-### Цель
-
-Генерировать human-readable reasoning.
-
-### Модули
-
-* insights engine
-* heuristic explanations
-* risk explanations
-* aggregation detection
-
-### Статус
-
-Early stage.
+```bash
+python cli.py scan Controller.php --adapter cakephp2
+```
 
 ---
 
-## 10. Historical Intelligence
+## Impact Analysis
 
-Использование memory в анализе.
-
-### Цель
-
-Учитывать исторические знания проекта.
-
-### Модули
-
-* historical weighting
-* recurring patterns
-* change propagation memory
-* historical risk amplification
-
-### Статус
-
-Partially implemented.
+```bash
+python cli.py impact User \
+Controller.php \
+User.php \
+--adapter cakephp2
+```
 
 ---
 
-# STAGE 4 — ADAPTER ARCHITECTURE
+## Merge Entity Model
 
-## 11. Framework Adapters
-
-Framework-specific parsing layer.
-
-### Цель
-
-Сделать core независимым от framework.
-
-### Модули
-
-* adapters/cakephp2
-* adapters/laravel
-* adapters/symfony
-* adapters/custom_php
-
-### Статус
-
-CakePHP2 adapter implemented.
+```bash
+python cli.py merge \
+Controller.php \
+User.php \
+--adapter cakephp2
+```
 
 ---
 
-## 12. Adapter Contracts
+# Architectural Direction
 
-Стандартизация adapter API.
+The system is evolving from:
 
-### Цель
+```text
+simple static analyzer
+```
 
-Сделать adapters interchangeable.
+toward:
 
-### Модули
+```text
+architectural intelligence platform
+```
 
-* parser contracts
-* graph contracts
-* entity contracts
-* adapter registry
+The long-term goal is a system capable of:
 
-### Статус
-
-Planned.
-
----
-
-# STAGE 5 — REFACTOR INTELLIGENCE
-
-## 13. Safe Refactor Engine
-
-AI-assisted safe transformations.
-
-### Цель
-
-Автоматизировать безопасный refactor.
-
-### Модули
-
-* safe rewrite validation
-* business logic preservation
-* semantic verification
-* rollback support
-
-### Статус
-
-Early prototype exists.
+* understanding legacy architecture;
+* estimating propagation risk;
+* preserving architectural memory;
+* generating explainable refactor guidance;
+* supporting safe AI-assisted evolution of large legacy systems.
 
 ---
 
-## 14. Merge & Propagation Engine
+# Core Architectural Concepts
 
-Propagation-aware refactoring.
+## Layered Connectivity Model
 
-### Цель
+Impact analysis currently combines:
 
-Понимать chain impact изменений.
+* dependency connectivity
+* association connectivity
+* behavioral connectivity
 
-### Модули
-
-* merge graph
-* cross-entity propagation
-* blast radius estimation
-* architectural cascade detection
-
-### Статус
-
-Planned.
+This creates a more realistic architectural risk model than traditional static dependency counting.
 
 ---
 
-## 15. Refactor Recommendations
+## Behavioral Graph Analysis
 
-Архитектурные рекомендации.
+The system distinguishes between:
 
-### Цель
+```text
+domain interactions
+```
 
-Подсказывать направления улучшения legacy-кода.
+and:
 
-### Модули
+```text
+framework interactions
+```
 
-* service extraction hints
-* god-controller detection
-* coupling reduction hints
-* dead dependency detection
-
-### Статус
-
-Planned.
+allowing architectural reasoning to focus on business-critical entities.
 
 ---
 
-# STAGE 6 — ADVANCED ARCHITECTURE INTELLIGENCE
+## Adapter Architecture
 
-## 16. Architectural Memory Graph
+Framework-specific parsing is isolated from the core intelligence engine.
 
-Knowledge graph проекта.
+Current adapter support:
 
-### Цель
+* CakePHP 2
 
-Хранить evolving architecture knowledge.
+Planned:
 
-### Модули
-
-* graph persistence
-* entity evolution tracking
-* historical architecture map
-* dependency evolution
-
-### Статус
-
-Future stage.
+* Laravel
+* Symfony
+* Custom PHP adapters
 
 ---
 
-## 17. Explainable AI Layer
+# Current Development Stage
 
-Объяснимый reasoning.
+The project is currently transitioning from:
 
-### Цель
+```text
+static analysis engine
+```
 
-Показывать почему система пришла к выводу.
+to:
 
-### Модули
+```text
+behavior-aware architectural intelligence system
+```
 
-* reasoning traces
-* scoring explanations
-* confidence estimation
-* impact explanation tree
+Main active areas:
 
-### Статус
-
-Future stage.
-
----
-
-## 18. Multi-Project Intelligence
-
-Cross-project learning.
-
-### Цель
-
-Накапливать reusable architectural patterns.
-
-### Модули
-
-* reusable patterns
-* framework heuristics
-* anti-pattern memory
-* domain archetypes
-
-### Статус
-
-Research stage.
-
----
-
-# STAGE 7 — STABILIZATION
-
-## 19. Regression Protection
-
-Защита от architectural regressions.
-
-### Цель
-
-Стабилизировать evolving architecture.
-
-### Модули
-
-* smoke tests
-* CLI validation
-* adapter validation
-* graph consistency tests
-
-### Статус
-
-Needed now.
-
----
-
-## 20. Output Layer
-
-Единый presentation layer.
-
-### Цель
-
-Унифицировать CLI output.
-
-### Модули
-
-* human-readable reports
-* JSON mode
-* debug mode
-* export layer
-
-### Статус
-
-Partially implemented.
-
----
-
-# LONG-TERM DIRECTION
-
-Система постепенно движется от:
-
-* simple static analyzer
-
-к:
-
-* architectural intelligence platform
-
-которая:
-
-* понимает legacy architecture;
-* хранит историю системы;
-* оценивает refactor risk;
-* помогает безопасной эволюции больших legacy-кодовых баз.
-
-## 21. Prompt Builder
-
-### Цель
-
-* Превратить LLM из:
-
-“анализатора кода”
-в:
-“архитектурного консультанта, работающего на основе модели системы”
-
-* Layer 1 — deterministic engine (система)
-graph
-impact
-entity model
-memory
-
-* Layer 2 — reasoning engine (LLM)
-refactor plan
-explanations
-design decisions
-
-* Добавить CLI:
-python cli.py prompt User UsersController.php User.php
-
-### Модули
-
-* prompt_builder/
-    entity_prompt.py
-    impact_prompt.py
-    refactor_prompt.py
-
-### Статус
-
-Research stage.
+* propagation-aware impact analysis
+* graph density modeling
+* explainable architectural reasoning
+* AI-assisted safe refactoring
