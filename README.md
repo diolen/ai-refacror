@@ -28,11 +28,9 @@ ai-refactor/
 ├── README.md
 ├── requirements.txt
 ├── cli.py
-├── bootstrap_history.py
-├── graph_v2_history.py
-├── impact_analysis_history.py
+├── config.py
 ├── memory.db
-├── memory_tmp.txt
+├── venv/
 │
 ├── analysis/
 │   ├── adapters/
@@ -42,25 +40,36 @@ ai-refactor/
 │   │       ├── graph_builder.py
 │   │       └── runner.py
 │   │
-│   ├── core/
-│   │   ├── entity_filter.py
-│   │   ├── entity_model.py
-│   │   ├── entity_normalizer.py
-│   │   ├── entity_enricher.py
-│   │   ├── graph_engine.py
-│   │   ├── impact_engine.py
-│   │   │
-│   │   └── prompt_builder/
-│   │       ├── entity_prompt.py
-│   │       ├── impact_prompt.py
-│   │       ├── refactor_prompt.py
-│   │       ├── prompt_context.py
-│   │       └── prompt_renderer.py
+│   └── core/
+│       ├── dependency_propagation.py
+│       ├── dependency_propagation_engine.py
+│       ├── entity_filter.py
+│       ├── entity_model.py
+│       ├── entity_normalizer.py
+│       ├── entity_enricher.py
+│       ├── graph_engine.py
+│       ├── history_store.py
+│       ├── impact_engine.py
+│       │
+│       └── prompt_builder/
+│           ├── base_contract.py
+│           ├── entity_prompt.py
+│           ├── impact_prompt.py
+│           ├── prompt_context.py
+│           ├── prompt_renderer.py
+│           └── refactor_prompt.py
 │
 ├── core/
 │   ├── llm.py
 │   ├── parser.py
 │   └── patcher.py
+│
+├── docs/
+│   ├── architecture/
+│   │   ├── contracts.md
+│   │   ├── state_20260509.md
+│   │   └── ...
+│   └── contracts.md
 │
 ├── memory/
 │   ├── cleanup.py
