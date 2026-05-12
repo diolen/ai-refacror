@@ -4,7 +4,8 @@ from analysis.adapters.cakephp2.runner import (
     run_scan,
     run_impact,
     run_merge,
-    run_prompt
+    run_prompt,
+    build_runtime_entity_model
 )
 
 from memory.view import (
@@ -12,6 +13,12 @@ from memory.view import (
     show_memory,
     show_timeline,
     search
+)
+
+from memory.snapshot import (
+    create_snapshot,
+    show_snapshot,
+    show_snapshots
 )
 
 
@@ -91,6 +98,21 @@ def main():
     )
 
     # =========================
+    # SNAPSHOT
+    # =========================
+    snapshot = sub.add_parser("snapshot")
+
+    snapshot.add_argument("name")
+    snapshot.add_argument("controller")
+    snapshot.add_argument("model")
+
+    snapshot.add_argument(
+        "--adapter",
+        choices=["cakephp2", "cakephp3", "cakephp4"],
+        default="cakephp2"
+    )
+
+    # =========================
     # MEMORY
     # =========================
     mem = sub.add_parser("memory")
@@ -98,6 +120,9 @@ def main():
     mem.add_argument("--last", type=int)
     mem.add_argument("--timeline", action="store_true")
     mem.add_argument("--search", type=str)
+
+    mem.add_argument("--snapshots", action="store_true")
+    mem.add_argument("--snapshot-show", type=str)
 
     args = parser.parse_args()
 
@@ -118,7 +143,31 @@ def main():
         if args.command == "prompt":
             return run_prompt(args)
 
+        # =========================
+        # SNAPSHOT
+        # =========================
+        if args.command == "snapshot":
+
+            entity_model = build_runtime_entity_model(
+                args.controller,
+                args.model
+            )
+
+            return create_snapshot(
+                args.name,
+                entity_model
+            )
+
+        # =========================
+        # MEMORY
+        # =========================
         if args.command == "memory":
+
+            if args.snapshots:
+                return show_snapshots()
+
+            if args.snapshot_show:
+                return show_snapshot(args.snapshot_show)
 
             if args.timeline:
                 return show_timeline()

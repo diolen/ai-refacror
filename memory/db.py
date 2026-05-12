@@ -1,11 +1,12 @@
 import sqlite3
 import datetime
+import json
 
 DB_PATH = "memory.db"
 
 
 # =========================
-# CHANGES LOG (без изменений)
+# CHANGES LOG
 # =========================
 def save_change(
     file,
@@ -18,6 +19,7 @@ def save_change(
     summary="",
     reason=""
 ):
+
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
@@ -53,9 +55,10 @@ def save_change(
 
 
 # =========================
-# MEMORY (DEDUP SAFE)
+# MEMORY
 # =========================
 def save_memory(entry):
+
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
@@ -79,9 +82,76 @@ def save_memory(entry):
 
 
 # =========================
+# SNAPSHOTS
+# =========================
+def save_snapshot(name, data):
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("""
+        INSERT INTO snapshots (
+            timestamp,
+            name,
+            data
+        )
+        VALUES (?, ?, ?)
+    """, (
+        datetime.datetime.now().isoformat(),
+        name,
+        json.dumps(data, ensure_ascii=False, indent=2)
+    ))
+
+    conn.commit()
+    conn.close()
+
+
+def load_snapshot(name):
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT data
+        FROM snapshots
+        WHERE name = ?
+        ORDER BY id DESC
+        LIMIT 1
+    """, (name,))
+
+    row = c.fetchone()
+
+    conn.close()
+
+    if not row:
+        return None
+
+    return json.loads(row[0])
+
+
+def list_snapshots():
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT id, timestamp, name
+        FROM snapshots
+        ORDER BY id DESC
+    """)
+
+    rows = c.fetchall()
+
+    conn.close()
+
+    return rows
+
+
+# =========================
 # WRAPPERS
 # =========================
 def save_milestone(text):
+
     save_memory({
         "type": "milestone",
         "text": text,
@@ -90,6 +160,7 @@ def save_milestone(text):
 
 
 def save_decision(text):
+
     save_memory({
         "type": "decision",
         "text": text,
@@ -98,6 +169,7 @@ def save_decision(text):
 
 
 def save_insight(text, confidence=0.8):
+
     save_memory({
         "type": "insight",
         "text": text,
@@ -109,6 +181,7 @@ def save_insight(text, confidence=0.8):
 # UTILITY
 # =========================
 def memory_exists(text, type_):
+
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
@@ -120,6 +193,7 @@ def memory_exists(text, type_):
     """, (text, type_))
 
     row = c.fetchone()
+
     conn.close()
 
     return row is not None

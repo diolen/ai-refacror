@@ -1,3 +1,5 @@
+Вот твой **state.md целиком с добавленным актуальным состоянием системы (без удаления ничего, только дополнил в конец):**
+
 ```md
 # AI Refactor System — Current State & Roadmap
 
@@ -251,4 +253,75 @@ From:
 To:
 
 > "reasoning system for codebase evolution"
+
+---
+
+## 📸 SNAPSHOT SYSTEM STATUS
+
+- snapshot creation: working
+- snapshot retrieval: working
+- snapshot listing: working
+- snapshot versioning: implicit (same name multiple records exist)
+- snapshot structure: enriched entity_model dump (not raw scan output)
+- snapshot persistence: SQLite-based
+- snapshot diffing: not implemented
+
+---
+
+## 🧠 MEMORY SYSTEM STATUS
+
+- milestones: working
+- decisions: working
+- insights: working
+- pattern tracking: working (frequency-based)
+- search: working
+- last-events retrieval: working
+- timeline: aggregated view (not event stream)
+
+---
+
+## 🔁 CURRENT DATA FLOW (VERIFIED IN PRACTICE)
+
+scan → entity_model → impact → prompt → snapshot → memory log
+
+---
+
+## ⚠️ KNOWN LIMITATIONS (FROM ACTUAL RUNS)
+
+- snapshot versioning is not semantic (no diff engine)
+- dependency data partially lost during entity_model transformation
+- memory layer is not connected back into analysis pipeline
+- timeline is aggregated, not event-stream based
+- entity prompt target can be lost in some modes ("TARGET: unknown")
+- entity ordering is not fully deterministic across runs
+
+---
+
+## 🧪 VERIFIED SYSTEM BEHAVIOR (FROM CLI PROGON)
+
+- scan produces frequency-based dependency graph
+- impact engine correctly computes score + connectivity
+- entity_model correctly builds associations for key entities (e.g. User, Sic)
+- prompt system successfully injects impact context (score, timeline, insights)
+- snapshot system stores enriched entity_model per run
+- memory system stores milestones, decisions, insights as persistent logs
+
+---
+
+## 🧠 ARCHITECTURE STATE CONFIRMATION
+
+System is currently a working multi-layer architecture:
+
+- Static Analysis Layer ✔
+- Entity Model Layer ✔
+- Impact Reasoning Layer ✔
+- Prompt Generation Layer ✔
+- Snapshot Persistence Layer ✔
+- Memory Event Layer ✔
+
+Memory is currently passive (logging only) and does not influence analysis pipeline.
 ```
+
+---
+
+Если хочешь дальше — можно завтра уже сделать следующий шаг: **state.md как “исполняемый контракт системы” (не документ, а runtime truth layer)**

@@ -202,3 +202,46 @@ def run_prompt(args):
     print("=" * 60 + "\n")
 
     return 0
+
+
+# =========================
+# RUNTIME ENTITY MODEL
+# =========================
+def build_runtime_entity_model(controller_file, model_file):
+
+    scan_result = scan_dependencies(controller_file)
+
+    deps_raw = scan_result.get("dependencies", [])
+
+    dependency_graph = {}
+
+    for d in deps_raw:
+
+        name = d.get("name")
+
+        if isinstance(name, str):
+            dependency_graph.setdefault(name, []).append(name)
+
+    assoc_result = parse_associations(model_file)
+
+    associations = {
+        assoc_result["model"]: assoc_result["associations"]
+    }
+
+    method_graph = build_graph(controller_file).get("domain", {})
+
+    entity_model = build_entity_model(
+        dependency_graph=dependency_graph,
+        associations=associations,
+        method_graph=method_graph,
+    )
+
+    entity_model = normalize_entity_model(entity_model)
+
+    entity_model = enrich_entity_model(
+        entity_model=entity_model,
+        scan_result=scan_result,
+        method_graph=method_graph
+    )
+
+    return entity_model
