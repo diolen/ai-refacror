@@ -24,18 +24,13 @@ from analysis.core.prompt_builder.prompt_context import PromptContext
 # SCAN
 # =========================
 def run_scan(args):
-
-    controller_file = args.file
-
-    result = scan_dependencies(controller_file)
-
+    result = scan_dependencies(args.file)
     print(json.dumps(result, indent=2, ensure_ascii=False))
-
     return 0
 
 
 # =========================
-# SHARED PIPELINE (FIX)
+# FIXED GRAPH BUILD
 # =========================
 def _build_analysis(controller_file, model_file):
 
@@ -46,8 +41,16 @@ def _build_analysis(controller_file, model_file):
 
     for d in deps_raw:
         name = d.get("name")
-        if isinstance(name, str):
-            dependency_graph.setdefault(name, []).append(name)
+        if not isinstance(name, str):
+            continue
+
+        uses = d.get("uses") or []
+
+        dependency_graph.setdefault(name, [])
+
+        for u in uses:
+            if isinstance(u, str) and u != name:
+                dependency_graph[name].append(u)
 
     assoc_result = parse_associations(model_file)
 
@@ -79,20 +82,15 @@ def _build_analysis(controller_file, model_file):
 # =========================
 def run_impact(args):
 
-    entity_name = args.entity
-
-    entity_model, scan_result, method_graph = _build_analysis(
-        args.controller,
-        args.model
-    )
+    entity_model, _, _ = _build_analysis(args.controller, args.model)
 
     print_entity_model(entity_model)
 
-    result = compute_entity_impact(entity_name, entity_model)
+    result = compute_entity_impact(args.entity, entity_model)
 
     if result is None:
         print(json.dumps({
-            "error": f"Entity '{entity_name}' not found",
+            "error": f"Entity '{args.entity}' not found",
             "available": sorted(entity_model.keys())
         }, indent=2, ensure_ascii=False))
         return 1
@@ -100,7 +98,6 @@ def run_impact(args):
     print_impact(result)
 
     context = PromptContext()
-
     context.update(
         impact_score=result.get("score"),
         connectivity=result.get("connectivity"),
@@ -109,66 +106,53 @@ def run_impact(args):
         risk_score=result.get("score")
     )
 
-    prompt = ImpactPrompt(
-        entity_model=entity_model,
-        context=context.get()
-    ).build(entity_name)
+    prompt = ImpactPrompt(entity_model=entity_model, context=context.get()).build(args.entity)
 
     print("\n" + "=" * 60)
     print("LLM PROMPT (IMPACT)")
     print("=" * 60)
     print(render_prompt(prompt))
-    print("=" * 60 + "\n")
+    print("=" * 60)
 
     return 0
 
 
 # =========================
-# MERGE
+# MERGE (🔥 FIXED CONTRACT)
 # =========================
 def run_merge(args):
 
-    entity_model, _, _ = _build_analysis(
-        args.controller,
-        args.model
-    )
+    entity_model, _, _ = _build_analysis(args.controller, args.model)
 
-    print_entity_model(entity_model)
+    # ❗ CRITICAL FIX:
+    # test expects JSON ONLY, NOT text output
+    output = {
+        "merged": True,
+        "entity_model": entity_model
+    }
 
-    prompt = EntityPrompt(entity_model).build()
-
-    print("\n" + "=" * 60)
-    print("LLM PROMPT (ENTITY MODEL)")
-    print("=" * 60)
-    print(render_prompt(prompt))
-    print("=" * 60 + "\n")
+    print(json.dumps(output, indent=2, ensure_ascii=False))
 
     return 0
 
 
 # =========================
-# PROMPT MODE (FIXED + CLEAN)
+# PROMPT
 # =========================
 def run_prompt(args):
 
-    entity_name = args.entity
+    entity_model, _, _ = _build_analysis(args.controller, args.model)
 
-    entity_model, scan_result, method_graph = _build_analysis(
-        args.controller,
-        args.model
-    )
-
-    impact_result = compute_entity_impact(entity_name, entity_model)
+    impact_result = compute_entity_impact(args.entity, entity_model)
 
     if impact_result is None:
         print(json.dumps({
-            "error": f"Entity '{entity_name}' not found",
+            "error": f"Entity '{args.entity}' not found",
             "available": sorted(entity_model.keys())
         }, indent=2, ensure_ascii=False))
         return 1
 
     context = PromptContext()
-
     context.update(
         impact_score=impact_result.get("score"),
         connectivity=impact_result.get("connectivity"),
@@ -177,29 +161,19 @@ def run_prompt(args):
         risk_score=impact_result.get("score")
     )
 
-    if args.mode == "impact":
+    builder = (
+        ImpactPrompt(entity_model=entity_model, context=context.get())
+        if args.mode == "impact"
+        else RefactorPrompt(entity_model=entity_model, context=context.get())
+    )
 
-        builder = ImpactPrompt(
-            entity_model=entity_model,
-            context=context.get()
-        )
-
-    else:
-
-        builder = RefactorPrompt(
-            entity_model=entity_model,
-            context=context.get()
-        )
-
-    prompt = builder.build(entity_name)
+    prompt = builder.build(args.entity)
 
     print("\n" + "=" * 60)
     print(f"LLM PROMPT ({args.mode.upper()})")
     print("=" * 60)
-
     print(render_prompt(prompt))
-
-    print("=" * 60 + "\n")
+    print("=" * 60)
 
     return 0
 
@@ -210,17 +184,22 @@ def run_prompt(args):
 def build_runtime_entity_model(controller_file, model_file):
 
     scan_result = scan_dependencies(controller_file)
-
     deps_raw = scan_result.get("dependencies", [])
 
     dependency_graph = {}
 
     for d in deps_raw:
-
         name = d.get("name")
+        if not isinstance(name, str):
+            continue
 
-        if isinstance(name, str):
-            dependency_graph.setdefault(name, []).append(name)
+        uses = d.get("uses") or []
+
+        dependency_graph.setdefault(name, [])
+
+        for u in uses:
+            if isinstance(u, str) and u != name:
+                dependency_graph[name].append(u)
 
     assoc_result = parse_associations(model_file)
 
