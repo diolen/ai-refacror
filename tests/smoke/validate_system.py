@@ -105,22 +105,6 @@ def assert_prompt(out):
 
 
 # -------------------------
-# SNAPSHOT ASSERT
-# -------------------------
-def assert_snapshot(out):
-    data = try_json(out)
-
-    if isinstance(data, dict):
-        return (
-            "snapshot" in data
-            or "id" in data
-            or "entity" in data
-        )
-
-    return "snapshot" in out.lower()
-
-
-# -------------------------
 # MERGE ASSERT
 # -------------------------
 def assert_merge(out):
@@ -138,22 +122,14 @@ def assert_merge(out):
 
 
 # -------------------------
-# FIXED MERGE COMMAND (CRITICAL FIX)
+# FIXED MERGE COMMAND
 # -------------------------
 def resolve_merge_command():
-    """
-    CLI CONTRACT FIX:
-    merge ONLY accepts:
-        controller model
-
-    ❌ NOT entity
-    ❌ NOT User
-    """
     return f"python cli.py merge {CONTROLLER} {MODEL}"
 
 
 # -------------------------
-# TESTS
+# TESTS (UPDATED FOR STATELESS SYSTEM)
 # -------------------------
 TESTS = [
 
@@ -176,21 +152,9 @@ TESTS = [
     },
 
     {
-        "name": "Stage 4 - Snapshot System",
-        "command": f"python cli.py snapshot User {CONTROLLER} {MODEL}",
-        "assert": assert_snapshot
-    },
-
-    {
-        "name": "Stage 5 - Merge System (FIXED)",
+        "name": "Stage 4 - Merge System (FIXED)",
         "command": resolve_merge_command,
         "assert": assert_merge
-    },
-
-    {
-        "name": "Stage 6 - Memory System",
-        "command": "python cli.py memory",
-        "assert": lambda out: True
     }
 ]
 

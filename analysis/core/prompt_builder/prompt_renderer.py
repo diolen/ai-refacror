@@ -14,13 +14,15 @@ def render_prompt(contract_output):
     lines.append(f"TARGET: {target}")
 
     # =========================
-    # SCORE
+    # METRICS
     # =========================
-    if data.get("score") is not None:
-        lines.append(f"\nIMPACT SCORE: {data['score']}")
+    metrics = data.get("metrics", {})
 
-    if data.get("connectivity") is not None:
-        lines.append(f"CONNECTIVITY: {data['connectivity']}")
+    if metrics.get("impact_score") is not None:
+        lines.append(f"\nIMPACT SCORE: {metrics['impact_score']}")
+
+    if metrics.get("connectivity") is not None:
+        lines.append(f"CONNECTIVITY: {metrics['connectivity']}")
 
     # =========================
     # ENTITY CORE
@@ -51,43 +53,7 @@ def render_prompt(contract_output):
                         lines.append(f"    - {v}")
 
     # =========================
-    # TIMELINE (FIXED)
-    # =========================
-    timeline = data.get("timeline", [])
-    if timeline:
-        lines.append("\nTIMELINE:")
-        for t in timeline:
-            lines.append(f"  - {t.get('event')} ({t.get('count')})")
-
-    # =========================
-    # PATTERNS (FIXED)
-    # =========================
-    patterns = data.get("patterns", [])
-    if patterns:
-        lines.append("\nPATTERNS:")
-        for p in patterns:
-            lines.append(f"  • {p}")
-
-    # =========================
-    # MILESTONES (FIXED)
-    # =========================
-    milestones = data.get("milestones", [])
-    if milestones:
-        lines.append("\nMILESTONES:")
-        for m in milestones:
-            lines.append(f"  • {m}")
-
-    # =========================
-    # DECISIONS (FIXED)
-    # =========================
-    decisions = data.get("decisions", [])
-    if decisions:
-        lines.append("\nDECISIONS:")
-        for d in decisions:
-            lines.append(f"  • {d}")
-
-    # =========================
-    # INSIGHTS
+    # INSIGHTS (CURRENT RUN ONLY)
     # =========================
     insights = data.get("insights", [])
     if insights:

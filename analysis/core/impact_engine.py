@@ -1,13 +1,16 @@
 def compute_entity_impact(entity_name, entity_model):
 
+    if not isinstance(entity_model, dict):
+        return None
+
     if entity_name not in entity_model:
         return None
 
-    entity = entity_model[entity_name]
+    entity = entity_model.get(entity_name, {})
 
-    methods = entity.get("methods", [])
-    dependencies = entity.get("dependencies", [])
-    associations = entity.get("associations", {})
+    methods = entity.get("methods", []) or []
+    dependencies = entity.get("dependencies", []) or []
+    associations = entity.get("associations", {}) or {}
 
     # =========================
     # WEIGHTS
@@ -32,7 +35,7 @@ def compute_entity_impact(entity_name, entity_model):
         else:
             name = d
 
-        if isinstance(name, str):
+        if isinstance(name, str) and name.strip():
             clean_dependencies.append(name)
 
     # =========================
@@ -43,22 +46,22 @@ def compute_entity_impact(entity_name, entity_model):
     score += len(methods) * WEIGHTS["method"]
     score += len(clean_dependencies) * WEIGHTS["dependency"]
 
-    score += len(associations.get("hasMany", [])) * WEIGHTS["hasMany"]
-    score += len(associations.get("belongsTo", [])) * WEIGHTS["belongsTo"]
-    score += len(associations.get("hasOne", [])) * WEIGHTS["hasOne"]
-    score += len(associations.get("hasAndBelongsToMany", [])) * WEIGHTS["hasAndBelongsToMany"]
+    score += len(associations.get("hasMany", []) or []) * WEIGHTS["hasMany"]
+    score += len(associations.get("belongsTo", []) or []) * WEIGHTS["belongsTo"]
+    score += len(associations.get("hasOne", []) or []) * WEIGHTS["hasOne"]
+    score += len(associations.get("hasAndBelongsToMany", []) or []) * WEIGHTS["hasAndBelongsToMany"]
 
-    # =========================================================
-    # 🧠 NEW CONNECTIVITY MODEL
-    # =========================================================
-
+    # =========================
+    # CONNECTIVITY MODEL
+    # =========================
     dependency_connectivity = len(clean_dependencies)
 
-    association_connectivity = 0
-    association_connectivity += len(associations.get("hasMany", [])) * WEIGHTS["hasMany"]
-    association_connectivity += len(associations.get("belongsTo", [])) * WEIGHTS["belongsTo"]
-    association_connectivity += len(associations.get("hasOne", [])) * WEIGHTS["hasOne"]
-    association_connectivity += len(associations.get("hasAndBelongsToMany", [])) * WEIGHTS["hasAndBelongsToMany"]
+    association_connectivity = (
+        len(associations.get("hasMany", []) or []) * WEIGHTS["hasMany"] +
+        len(associations.get("belongsTo", []) or []) * WEIGHTS["belongsTo"] +
+        len(associations.get("hasOne", []) or []) * WEIGHTS["hasOne"] +
+        len(associations.get("hasAndBelongsToMany", []) or []) * WEIGHTS["hasAndBelongsToMany"]
+    )
 
     behavioral_connectivity = len(methods)
 
@@ -79,6 +82,7 @@ def compute_entity_impact(entity_name, entity_model):
     business_methods = [
         m for m in methods
         if isinstance(m, str)
+        and m.strip()
         and not m.lower().startswith(("get", "set", "is", "find", "read"))
     ]
 
@@ -95,7 +99,7 @@ def compute_entity_impact(entity_name, entity_model):
     if len(clean_dependencies) >= 3:
         insights.append(f"{entity_name} has high external coupling")
 
-    if len(associations.get("hasMany", [])) >= 2:
+    if len(associations.get("hasMany", []) or []) >= 2:
         insights.append(f"{entity_name} is aggregation root candidate")
 
     if len(business_methods) >= 5:
@@ -124,7 +128,7 @@ def compute_entity_impact(entity_name, entity_model):
 
 
 # =========================
-# OUTPUT LAYER (RESTORED API)
+# OUTPUT LAYER
 # =========================
 
 def print_impact(result):
@@ -134,10 +138,10 @@ def print_impact(result):
         return
 
     print("\n" + "=" * 60)
-    print(f"IMPACT ANALYSIS: {result['model']}")
+    print(f"IMPACT ANALYSIS: {result.get('model')}")
     print("=" * 60)
 
-    print(f"\nScore: {result['score']}")
+    print(f"\nScore: {result.get('score', 0)}")
     print(f"Connectivity: {result.get('connectivity', 0)}")
 
     print("\nMethods:")
@@ -149,11 +153,11 @@ def print_impact(result):
         print(f"  - {d}")
 
     print("\nAssociations:")
-    assoc = result.get("associations", {})
+    assoc = result.get("associations", {}) or {}
 
     for key in ["hasMany", "belongsTo", "hasOne", "hasAndBelongsToMany"]:
         print(f"  {key}:")
-        values = assoc.get(key, [])
+        values = assoc.get(key, []) or []
         if values:
             for v in values:
                 print(f"    - {v}")
@@ -169,7 +173,7 @@ def print_impact(result):
 
 def print_entity_model(entity_model):
 
-    if not entity_model:
+    if not isinstance(entity_model, dict) or not entity_model:
         print("No entities found")
         return
 
@@ -190,11 +194,11 @@ def print_entity_model(entity_model):
             print(f"    - {d}")
 
         print("\n  Associations:")
-        assoc = data.get("associations", {})
+        assoc = data.get("associations", {}) or {}
 
         for assoc_type in ["hasMany", "belongsTo", "hasOne", "hasAndBelongsToMany"]:
             print(f"\n    {assoc_type}:")
-            values = assoc.get(assoc_type, [])
+            values = assoc.get(assoc_type, []) or []
             if values:
                 for v in values:
                     print(f"      - {v}")

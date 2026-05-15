@@ -7,7 +7,7 @@ def build_entity_model(
     entities = {}
 
     # =========================
-    # IMPORTS (FIXED)
+    # IMPORTS
     # =========================
     from analysis.core.entity_normalizer import normalize_entity
     from analysis.core.entity_filter import (
@@ -19,9 +19,7 @@ def build_entity_model(
     # SAFE GET
     # =========================
     def safe_get(graph, key):
-        if not isinstance(graph, dict):
-            return {}
-        return graph.get(key, {})
+        return graph.get(key, {}) if isinstance(graph, dict) else {}
 
     # =========================
     # METHODS RESOLVER
@@ -31,20 +29,20 @@ def build_entity_model(
         if not isinstance(method_graph, dict):
             return []
 
-        # flat
         if model in method_graph and isinstance(method_graph[model], list):
-            return method_graph[model]
+            return method_graph[model] or []
 
-        # nested
         for section in ("domain", "framework"):
             section_data = method_graph.get(section, {})
-            if isinstance(section_data, dict) and model in section_data:
-                return section_data[model]
+            if isinstance(section_data, dict):
+                methods = section_data.get(model, [])
+                if isinstance(methods, list):
+                    return methods
 
         return []
 
     # =========================
-    # COLLECT MODELS
+    # COLLECT MODELS (DETERMINISTIC)
     # =========================
     all_models = set()
 
@@ -59,12 +57,15 @@ def build_entity_model(
     if isinstance(associations, dict):
         all_models.update(associations.keys())
 
+    # deterministic ordering
+    all_models = sorted(all_models)
+
     # =========================
     # BUILD ENTITIES
     # =========================
-    for model in all_models:
+    for raw_model in all_models:
 
-        model = normalize_entity(model)
+        model = normalize_entity(raw_model)
         if not model:
             continue
 
@@ -87,10 +88,9 @@ def build_entity_model(
         raw_methods = get_methods(model)
 
         if isinstance(raw_methods, list):
-            entities[model]["methods"] = [
-                m for m in raw_methods
-                if isinstance(m, str) and m.strip()
-            ]
+            entities[model]["methods"] = sorted(
+                [m for m in raw_methods if isinstance(m, str) and m.strip()]
+            )
 
         # =========================
         # DEPENDENCIES
@@ -103,14 +103,17 @@ def build_entity_model(
             seen = set()
 
             for d in deps:
+
                 name = d.get("name") if isinstance(d, dict) else d
                 name = normalize_entity(name)
 
-                if name and name not in seen:
-                    clean.append(name)
-                    seen.add(name)
+                if not name or name in seen:
+                    continue
 
-            entities[model]["dependencies"] = clean
+                clean.append(name)
+                seen.add(name)
+
+            entities[model]["dependencies"] = sorted(clean)
 
         # =========================
         # ASSOCIATIONS
@@ -130,13 +133,16 @@ def build_entity_model(
                 seen = set()
 
                 for t in targets:
+
                     t = normalize_entity(t)
 
-                    if t and t not in seen:
-                        clean.append(t)
-                        seen.add(t)
+                    if not t or t in seen:
+                        continue
 
-                normalized[assoc_type] = clean
+                    clean.append(t)
+                    seen.add(t)
+
+                normalized[assoc_type] = sorted(clean)
 
             entities[model]["associations"] = normalized
 

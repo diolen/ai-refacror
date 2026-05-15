@@ -4,27 +4,15 @@ from analysis.adapters.cakephp2.runner import (
     run_scan,
     run_impact,
     run_merge,
-    run_prompt,
-    build_runtime_entity_model
-)
-
-from memory.view import (
-    show_last,
-    show_memory,
-    show_timeline,
-    search
-)
-
-from memory.snapshot import (
-    create_snapshot,
-    show_snapshot,
-    show_snapshots
+    run_prompt
 )
 
 
 def main():
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="AI Refactor System CLI"
+    )
 
     parser.add_argument(
         "--adapter",
@@ -34,47 +22,48 @@ def main():
 
     sub = parser.add_subparsers(dest="command")
 
+    # =========================
     # SCAN
+    # =========================
     scan = sub.add_parser("scan")
     scan.add_argument("file")
 
+    # =========================
     # IMPACT
+    # =========================
     impact = sub.add_parser("impact")
     impact.add_argument("entity")
     impact.add_argument("controller")
     impact.add_argument("model")
 
+    # =========================
     # MERGE
+    # =========================
     merge = sub.add_parser("merge")
     merge.add_argument("controller")
     merge.add_argument("model")
 
+    # =========================
     # PROMPT
+    # =========================
     prompt = sub.add_parser("prompt")
     prompt.add_argument("entity")
     prompt.add_argument("controller")
     prompt.add_argument("model")
     prompt.add_argument("--mode", choices=["impact", "refactor"], default="impact")
 
-    # SNAPSHOT
-    snapshot = sub.add_parser("snapshot")
-    snapshot.add_argument("name")
-    snapshot.add_argument("controller")
-    snapshot.add_argument("model")
-
-    # MEMORY
-    mem = sub.add_parser("memory")
-    mem.add_argument("--last", type=int)
-    mem.add_argument("--timeline", action="store_true")
-    mem.add_argument("--search", type=str)
-    mem.add_argument("--snapshots", action="store_true")
-    mem.add_argument("--snapshot-show", type=str)
-
     args = parser.parse_args()
 
+    # =========================
+    # ADAPTER CHECK
+    # =========================
     if args.adapter != "cakephp2":
+        print(f"[error] unsupported adapter: {args.adapter}")
         return 1
 
+    # =========================
+    # ROUTER
+    # =========================
     if args.command == "scan":
         return run_scan(args)
 
@@ -87,21 +76,10 @@ def main():
     if args.command == "prompt":
         return run_prompt(args)
 
-    if args.command == "snapshot":
-        entity_model = build_runtime_entity_model(args.controller, args.model)
-        return create_snapshot(args.name, entity_model)
-
-    if args.command == "memory":
-        if args.snapshots:
-            return show_snapshots()
-        if args.snapshot_show:
-            return show_snapshot(args.snapshot_show)
-        if args.timeline:
-            return show_timeline()
-        if args.search:
-            return search(args.search)
-        return show_last(args.last or 20)
-
+    # =========================
+    # FALLBACK
+    # =========================
+    print("[error] no command provided. use --help")
     return 1
 
 

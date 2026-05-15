@@ -29,7 +29,6 @@ ai-refactor/
 ├── requirements.txt
 ├── cli.py
 ├── config.py
-├── memory.db
 ├── venv/
 │
 ├── analysis/
@@ -48,7 +47,6 @@ ai-refactor/
 │       ├── entity_normalizer.py
 │       ├── entity_enricher.py
 │       ├── graph_engine.py
-│       ├── history_store.py
 │       ├── impact_engine.py
 │       │
 │       └── prompt_builder/
@@ -66,20 +64,26 @@ ai-refactor/
 │
 ├── docs/
 │   ├── architecture/
-│   │   ├── contracts.md
-│   │   ├── state_20260509.md
-│   │   └── ...
+│   │   ├── analysis_system_spec.md
+│   │   ├── chat_memory.md
+│   │   ├── commit_taxonomy.md
+│   │   ├── llm_context.md
+│   │   ├── prompt_contracts.md
+│   │   ├── state.md
+│   │   └── todo.md
 │   └── contracts.md
 │
-├── memory/
-│   ├── cleanup.py
-│   ├── db.py
-│   ├── init_db.py
-│   ├── migrate.py
-│   └── view.py
+├── prompts/
+│   └── refactor.txt
 │
-└── prompts/
-    └── refactor.txt
+└── tests/
+    ├── README.md
+    ├── expected/
+    ├── fixtures/
+    │   └── cakephp2/
+    │       ├── Controller/
+    │       └── Model/
+    └── smoke/
 ```
 
 ---

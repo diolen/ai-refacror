@@ -1,6 +1,4 @@
 from analysis.core.impact_engine import compute_entity_impact
-from memory.db import save_milestone, save_decision, save_insight
-
 
 MILESTONE_FREQUENCY_THRESHOLD = 3
 
@@ -9,6 +7,7 @@ MILESTONE_FREQUENCY_THRESHOLD = 3
 # MAIN PIPELINE
 # =========================
 def enrich_entity_model(entity_model, scan_result, method_graph):
+
     if not isinstance(entity_model, dict):
         return {}
 
@@ -18,6 +17,7 @@ def enrich_entity_model(entity_model, scan_result, method_graph):
     enriched = {}
 
     for entity_name, entity_data in entity_model.items():
+
         if not isinstance(entity_data, dict):
             continue
 
@@ -28,18 +28,6 @@ def enrich_entity_model(entity_model, scan_result, method_graph):
         decisions = _build_decisions(entity_name, entity_data, method_graph)
         insights = _build_insights(impact)
         patterns = _build_patterns(entity_name, dependencies, method_events)
-
-        # =========================
-        # PERSIST MEMORY
-        # =========================
-        for m in milestones:
-            save_milestone(m)
-
-        for d in decisions:
-            save_decision(d)
-
-        for i in insights:
-            save_insight(i)
 
         enriched[entity_name] = {
             "methods": entity_data.get("methods", []),
@@ -59,6 +47,7 @@ def enrich_entity_model(entity_model, scan_result, method_graph):
 # DEPENDENCY EXTRACTION
 # =========================
 def _collect_dependency_entries(scan_result):
+
     if not isinstance(scan_result, dict):
         return []
 
@@ -69,6 +58,7 @@ def _collect_dependency_entries(scan_result):
     entries = []
 
     for item in dependencies:
+
         if not isinstance(item, dict):
             continue
 
@@ -78,8 +68,10 @@ def _collect_dependency_entries(scan_result):
 
         if not isinstance(model, str) or not model.strip():
             continue
+
         if not isinstance(method, str) or not method.strip():
             continue
+
         if not isinstance(frequency, int) or frequency < 1:
             frequency = 1
 
@@ -96,22 +88,27 @@ def _collect_dependency_entries(scan_result):
 # METHOD GRAPH EVENTS
 # =========================
 def _collect_method_events(method_graph):
+
     if not isinstance(method_graph, dict):
         return {}
 
     events = {}
 
     for section_data in method_graph.values():
+
         if not isinstance(section_data, dict):
             continue
 
         for entity_name, methods in section_data.items():
+
             if not isinstance(entity_name, str):
                 continue
+
             if not isinstance(methods, list):
                 continue
 
             for method in methods:
+
                 if not isinstance(method, str) or not method.strip():
                     continue
 
@@ -124,10 +121,12 @@ def _collect_method_events(method_graph):
 # TIMELINE
 # =========================
 def _build_timeline(entity_name, dependency_entries, method_events):
+
     timeline = []
     seen = {}
 
     for item in dependency_entries:
+
         if item["entity"] != entity_name:
             continue
 
@@ -135,11 +134,15 @@ def _build_timeline(entity_name, dependency_entries, method_events):
         seen[event] = seen.get(event, 0) + item["frequency"]
 
     for method in method_events.get(entity_name, []):
+
         event = f"{entity_name}.{method}"
         seen[event] = seen.get(event, 0) + 1
 
     for event, count in seen.items():
-        timeline.append({"event": event, "count": count})
+        timeline.append({
+            "event": event,
+            "count": count
+        })
 
     return sorted(timeline, key=lambda e: (-e["count"], e["event"]))
 
@@ -148,10 +151,12 @@ def _build_timeline(entity_name, dependency_entries, method_events):
 # MILESTONES
 # =========================
 def _build_milestones(entity_name, dependency_entries):
+
     milestones = []
 
     entity_dependencies = [
-        item for item in dependency_entries if item["entity"] == entity_name
+        item for item in dependency_entries
+        if item["entity"] == entity_name
     ]
 
     if entity_dependencies:
@@ -163,6 +168,7 @@ def _build_milestones(entity_name, dependency_entries):
         milestones.append(f"{entity_name} reached stable usage")
 
     per_method = {}
+
     for item in entity_dependencies:
         per_method[item["method"]] = per_method.get(item["method"], 0) + item["frequency"]
 
@@ -184,6 +190,7 @@ def _build_milestones(entity_name, dependency_entries):
 # DECISIONS
 # =========================
 def _build_decisions(entity_name, entity_data, method_graph):
+
     decisions = []
 
     if isinstance(method_graph, dict) and "framework" in method_graph:
@@ -201,6 +208,7 @@ def _build_decisions(entity_name, entity_data, method_graph):
 # INSIGHTS
 # =========================
 def _build_insights(impact):
+
     score = impact.get("score", 0)
     connectivity = impact.get("connectivity", 0)
 
@@ -226,11 +234,13 @@ def _build_insights(impact):
 # PATTERNS
 # =========================
 def _build_patterns(entity_name, dependency_entries, method_events):
+
     patterns = []
 
     repeated = {}
 
     for item in dependency_entries:
+
         if item["entity"] != entity_name:
             continue
 

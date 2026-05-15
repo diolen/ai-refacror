@@ -2,23 +2,25 @@ from analysis.core.prompt_builder.base_contract import PromptContract
 
 
 class ImpactPrompt(PromptContract):
+    """
+    Builds deterministic impact analysis prompt.
+
+    Uses only current entity state + computed metrics.
+    No historical or persistence-based fields allowed.
+    """
 
     def build(self, target_entity):
 
-        entity = self.entity_model.get(target_entity)
+        entity = (self.entity_model or {}).get(target_entity)
 
         # =========================
-        # SAFETY LAYER (IMPORTANT FIX)
+        # SAFETY LAYER
         # =========================
         if not isinstance(entity, dict):
             entity = {
                 "methods": [],
                 "dependencies": [],
-                "associations": {},
-                "milestones": [],
-                "decisions": [],
-                "patterns": [],
-                "timeline": []
+                "associations": {}
             }
 
         return {
@@ -27,34 +29,25 @@ class ImpactPrompt(PromptContract):
 
             "input": {
                 # =========================
-                # CORE ENTITY
+                # CORE ENTITY (CURRENT STATE ONLY)
                 # =========================
-                "entity": entity,
+                "entity": {
+                    "methods": entity.get("methods", []) or [],
+                    "dependencies": entity.get("dependencies", []) or [],
+                    "associations": entity.get("associations", {}) or {}
+                },
 
                 # =========================
-                # METRICS (from context)
+                # METRICS (CURRENT RUN ONLY)
                 # =========================
-                "score": self.context.get("impact_score"),
-                "connectivity": self.context.get("connectivity"),
+                "metrics": {
+                    "impact_score": self.context.get("impact_score", 0),
+                    "connectivity": self.context.get("connectivity", 0)
+                },
 
                 # =========================
-                # AI INSIGHTS (from context)
+                # INSIGHTS (CURRENT RUN ONLY)
                 # =========================
-                "insights": self.context.get("insights", []),
-
-                # =========================
-                # STRUCTURE (entity_model)
-                # =========================
-                "methods": entity.get("methods", []),
-                "dependencies": entity.get("dependencies", []),
-                "associations": entity.get("associations", {}),
-
-                # =========================
-                # ENRICHED ANALYSIS LAYER
-                # =========================
-                "milestones": entity.get("milestones", []),
-                "decisions": entity.get("decisions", []),
-                "patterns": entity.get("patterns", []),
-                "timeline": entity.get("timeline", [])
+                "insights": self.context.get("insights", [])
             }
         }
