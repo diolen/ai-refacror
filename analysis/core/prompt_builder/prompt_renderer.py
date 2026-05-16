@@ -1,75 +1,79 @@
+from analysis.core.prompt_builder.blocks.system_rules_block import SystemRulesBlock
+from analysis.core.prompt_builder.blocks.impact_block import ImpactBlock
+from analysis.core.prompt_builder.blocks.dependency_block import DependencyBlock
+from analysis.core.prompt_builder.blocks.architecture_block import ArchitectureBlock
+from analysis.core.prompt_builder.blocks.output_block import OutputBlock
+
+
+BLOCKS = [
+    SystemRulesBlock(),
+    ImpactBlock(),
+    DependencyBlock(),
+    ArchitectureBlock(),
+    OutputBlock()
+]
+
+
 def render_prompt(contract_output):
 
     task = contract_output.get("task", "unknown")
     target = contract_output.get("target", "unknown")
+    task_description = contract_output.get("task_description", "")
 
     data = contract_output.get("input", {})
 
+    context_data = dict(data)
+    context_data["task"] = task
+
     lines = []
 
-    # =========================
+    # ==========================================
     # HEADER
-    # =========================
-    lines.append(f"TASK: {task}")
-    lines.append(f"TARGET: {target}")
+    # ==========================================
 
-    # =========================
-    # METRICS
-    # =========================
-    metrics = data.get("metrics", {})
+    lines.append(f"TASK TYPE: {task}")
+    lines.append(f"TARGET ENTITY: {target}")
 
-    if metrics.get("impact_score") is not None:
-        lines.append(f"\nIMPACT SCORE: {metrics['impact_score']}")
+    if task_description:
+        lines.append(
+            f"TASK DESCRIPTION: {task_description}"
+        )
 
-    if metrics.get("connectivity") is not None:
-        lines.append(f"CONNECTIVITY: {metrics['connectivity']}")
+    # ==========================================
+    # OBJECTIVE
+    # ==========================================
 
-    # =========================
-    # ENTITY CORE
-    # =========================
+    objective = data.get("objective")
+
+    if objective:
+
+        lines.append("\nOBJECTIVE:")
+        lines.append(objective)
+
+    # ==========================================
+    # ENTITY METHODS
+    # ==========================================
+
     entity = data.get("entity", {})
 
-    if isinstance(entity, dict):
+    methods = entity.get("methods", [])
 
-        methods = entity.get("methods", [])
-        if methods:
-            lines.append("\nMETHODS:")
-            for m in methods:
-                lines.append(f"  - {m}")
+    if methods:
 
-        dependencies = entity.get("dependencies", [])
-        if dependencies:
-            lines.append("\nDEPENDENCIES:")
-            for d in dependencies:
-                lines.append(f"  - {d}")
+        lines.append("\nMETHODS:")
 
-        associations = entity.get("associations", {})
-        if associations:
-            lines.append("\nASSOCIATIONS:")
-            for assoc_type, values in associations.items():
-                if values:
-                    lines.append(f"  {assoc_type}:")
-                    for v in values:
-                        lines.append(f"    - {v}")
+        for method in methods:
+            lines.append(f"  - {method}")
 
-    # =========================
-    # INSIGHTS (CURRENT RUN ONLY)
-    # =========================
-    insights = data.get("insights", [])
-    if insights:
-        lines.append("\nARCHITECTURAL INSIGHTS:")
-        for i in insights:
-            lines.append(f"  • {i}")
+    # ==========================================
+    # BLOCK PIPELINE
+    # ==========================================
 
-    # =========================
-    # OBJECTIVE
-    # =========================
-    if task == "impact_analysis":
-        lines.append("\nOBJECTIVE:")
-        lines.append("Analyze architectural impact and propagation risk.")
+    for block in BLOCKS:
 
-    elif task == "refactor_suggestion":
-        lines.append("\nOBJECTIVE:")
-        lines.append("Suggest safe refactor strategy preserving business behavior.")
+        rendered = block.render(context_data)
+
+        if rendered:
+            lines.append("\n" + rendered)
 
     return "\n".join(lines)

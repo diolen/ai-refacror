@@ -1,358 +1,184 @@
+Вот финальная, чистая версия `llm_context.md`, уже полностью приведённая к твоей текущей цели — **Prompt Compiler для LLM**, без архитектурного “шума” и лишних системных слоёв.
+
+---
+
 # 🧠 LLM КОНТЕКСТ
 
 ## 📌 ПРОЕКТ
 
-AI-assisted architectural reasoning system for legacy CakePHP 2 projects.
+LLM Prompt Compiler for legacy CakePHP 2/3/4 codebases.
 
 Purpose:
-analyze legacy architecture, estimate refactor risk, and support safe AI-assisted system evolution.
+transform codebase + task into an optimized prompt for external LLM execution.
 
 ---
 
-# 📊 ТЕКУЩИЙ СТАТУС
+# 🎯 ГЛАВНАЯ ЦЕЛЬ СИСТЕМЫ
 
-System status:
-PRODUCTION-STABLE (analysis engine active)
+Система НЕ решает задачи напрямую.
 
-Validated pipeline stages:
+Она компилирует вход в LLM-инструкцию:
 
-* scan
-* impact
-* prompt
-* snapshot
-* merge
-
-All current validation stages passing.
-
-(memory system removed)
+```text id="goal"
+CODEBASE(adapter:CakePHP2/3/4) + TASK
+→ ANALYSIS(optional LLM)
+→ OPTIMIZED LLM PROMPT
+→ EXTERNAL LLM EXECUTION
+```
 
 ---
 
-# 🏗️ ОСНОВНАЯ АРХИТЕКТУРА
+# 🏗️ ОСНОВНОЙ PIPELINE
 
-Pipeline:
-
-```text
+```text id="pipeline"
 scan
 → entity_model
 → impact
 → prompt
-→ snapshot
-````
+```
 
-Architecture layers:
-
-* static analysis layer
-* entity model layer
-* impact reasoning layer
-* prompt generation layer
-* snapshot layer
-
-Framework adapters are isolated from core engine.
-
-Current supported framework:
-
-* CakePHP 2
+Output:
+→ structured prompt for external LLM
 
 ---
 
-# 🧠 КЛЮЧЕВЫЕ КОНЦЕПЦИИ
+# 🧠 КЛЮЧЕВЫЕ МОДУЛИ
 
 ## entity_model
 
-Canonical architectural data contract (serialized IR).
+Normalized structural representation of codebase.
 
 Contains:
 
 * methods
 * dependencies
 * associations
-* behavioral signals
-* insights
-* patterns
-* timeline
+* lightweight insights
 
-Acts as deterministic intermediate representation between parsing and reasoning.
+Purpose:
+provide deterministic structural IR for analysis.
 
 ---
 
 ## impact engine
 
-Propagation-aware architectural risk scoring system.
+Computes architectural characteristics:
 
-Combines:
-
+* complexity score
 * dependency connectivity
-* association connectivity
-* behavioral signals
+* coupling level
+* architectural hotspots
 
-Produces:
-
-* score
-* connectivity
-* insights
+Purpose:
+enrich prompt with risk/complexity signals.
 
 ---
 
 ## prompt builder
 
-Structured reasoning-oriented prompt generation system.
+Core system output generator.
 
-Uses:
+Input:
 
+* task (refactor / debug / feature)
 * entity_model
 * impact analysis
-* prompt_context
-* architectural metadata
 
----
+Output:
 
-## prompt contracts
+* optimized structured prompt for external LLM
 
-Typed prompt generators defining structured LLM inputs:
-
-* EntityPrompt
-* ImpactPrompt
-* RefactorPrompt
-
-All prompts must be deterministic and serializable.
-
----
-
-## snapshots
-
-Persistent architectural state dumps.
-
-Used for:
-
-* state recovery
-* reasoning continuity
-* architecture inspection
+Purpose:
+compress full analysis into LLM-ready instruction set.
 
 ---
 
 # ⚙️ ТЕКУЩИЕ ВОЗМОЖНОСТИ
 
-Implemented:
-
-* dependency scanning
-* CakePHP association parsing
-* graph building
+* CakePHP 2 static code analysis
+* dependency extraction
+* association parsing
+* entity normalization
 * impact scoring
-* behavioral enrichment
-* hotspot detection
-* prompt generation
-* snapshot persistence
-* CLI routing
+* prompt generation for LLM execution
 
 ---
 
-# ⚠️ ТЕКУЩИЕ ОГРАНИЧЕНИЯ
+# ⚠️ ОГРАНИЧЕНИЯ
 
-Known limitations:
-
-* dependency transformation partially lossy
-* no reasoning graph
-* no semantic diff engine
-* no explainability engine
-* entity ordering not fully deterministic
-
----
-
-# 🚀 ТЕКУЩИЙ ФОКУС РАЗРАБОТКИ
-
-Current focus:
-simplifying architectural context into portable LLM bootstrap format.
-
-Decision:
-replace complex memory/event system with curated llm_context.md.
-
-Reason:
-LLM needs compressed semantic state, not raw telemetry history.
-
----
-
-# 🎯 АКТИВНЫЕ ЦЕЛИ
-
-Near-term goals:
-
-1. Stable llm_context.md workflow
-2. Deterministic context structure
-3. Lossless entity_model transformation
-4. Explainability layer
-5. Reasoning graph
-
----
-
-# 📚 ВАЖНАЯ ТЕРМИНОЛОГИЯ
-
-entity_model:
-normalized architectural IR (deterministic contract)
-
-impact:
-propagation-aware architectural risk score
-
-hotspot:
-high-coupling or high-risk entity
-
-snapshot:
-persistent architecture state dump
-
-adapter:
-framework-specific parsing layer
-
-prompt_context:
-intermediate structured state between impact and prompt generation
+* no persistent memory
+* no runtime state retention
+* no snapshot system
+* no self-execution
+* no long-term graph persistence
+* no background knowledge accumulation
 
 ---
 
 # 🧱 ПРИНЦИПЫ СИСТЕМЫ
 
-* CLI is source of truth
-* chat is reasoning interface
-* LLM is stateless
-* architecture state must remain portable
-* prompts must be deterministic
-* framework parsing must stay isolated from reasoning core
+* system is stateless
+* CLI is single source of truth
+* output is deterministic
+* no hidden memory or caching
+* each run is independent
+* focus is prompt quality, not system evolution
 
 ---
 
-# 🛡️ БЕЗОПАСНАЯ ЗОНА ЭВОЛЮЦИИ
+# 🎯 ФОКУС СИСТЕМЫ
 
-Safe areas for continued development:
+System is optimized for generating LLM prompts for:
 
-* explainability
-* reasoning graph
-* propagation modeling
-* prompt quality
-* deterministic serialization
+* refactoring legacy code
+* debugging issues
+* generating new features
 
-Avoid large architectural rewrites unless required.
+All logic exists only to improve prompt quality.
 
 ---
 
-# ⚙️ КОНТРАКТ ВЫПОЛНЕНИЯ (RUNTIME CONTRACT)
+# 🧠 ТЕРМИНОЛОГИЯ
 
-This section defines how the system behaves during execution.
+## entity_model
 
-## INPUT STATE
+Structured representation of code architecture.
 
-All execution starts from:
+## impact
 
-* CLI command
-* file path (controller/model)
-* adapter (CakePHP2)
+Scoring layer for complexity, coupling, and risk.
 
-No persistent state is used.
+## prompt
 
----
-
-## EXECUTION FLOW
-
-All commands must follow deterministic pipeline:
-
-1. scan → produces dependency graph
-2. entity_model → normalized IR
-3. impact → risk scoring + connectivity
-4. prompt → structured LLM input
+Final LLM-ready instruction set.
 
 ---
 
-## STATE RULE
+# 🧭 EXECUTION MODEL
 
-The system is stateless.
+```text id="exec_model"
+INPUT:
+- task
+- codebase
 
-Allowed runtime state:
+PROCESS:
+scan → entity_model → impact → prompt
 
-* in-memory entity_model
-* in-memory impact result
-* in-memory prompt_context
-
-Disallowed:
-
-* persistent memory
-* hidden caches
-* implicit historical state
-
----
-
-## SOURCE OF TRUTH
-
-* CLI execution is authoritative
-* entity_model is canonical IR
-* llm_context.md defines expected system behavior
-
----
-
-## OUTPUT CONTRACT
-
-All outputs must be:
-
-* deterministic
-* serializable
-* free of hidden state
-
----
-
-# 🧱 СХЕМА ENTITY MODEL
-
-Canonical structure:
-
-```json
-{
-  "methods": [],
-  "dependencies": [],
-  "associations": {},
-  "milestones": [],
-  "decisions": [],
-  "patterns": [],
-  "insights": [],
-  "timeline": []
-}
+OUTPUT:
+optimized LLM prompt
 ```
 
 ---
 
-## RULES
+# 🛑 СТАБИЛЬНОЕ СОСТОЯНИЕ
 
-* must be deterministic
-* no duplicates
-* all names normalized
-* associations must be directional grouped
+System is stable and validated.
 
----
+Working modules:
 
-# 🔄 МОДЕЛЬ СОСТОЯНИЙ PIPELINE
-
-Each entity passes through states:
-
-* RAW (scan output)
-* NORMALIZED (entity_model)
-* ANALYZED (impact applied)
-* ENRICHED (insights + patterns)
-* PROMPTED (LLM-ready output)
-
----
-
-## RULE
-
-Each stage must be:
-
-* pure function
-* deterministic
-* stateless
-
----
-
-# 🛑 ПОСЛЕДНЕЕ СТАБИЛЬНОЕ СОСТОЯНИЕ
-
-Validation summary:
-
-* all major pipeline stages passing
-* merge contract fixed
-* self-loop dependency bug fixed
-* snapshot serialization stable
-* CLI contracts stable
+* scan
+* impact
+* prompt generation
 
 Date:
 2026-05-15
@@ -361,25 +187,28 @@ Date:
 
 # VERSION
 
-llm_context_version: 2.1-runtime-contract-stable
-
-```
+llm_context_version: 3.0-prompt-compiler-core
 
 ---
 
-# 🧭 Что дальше (логично по системе)
+💬 ЧТО ЭТО ЗНАЧИТ ДЛЯ ТЕБЯ СЕЙЧАС
 
-Теперь у тебя есть стабильный фундамент. Следующий шаг **не усложнение**, а усиление:
+Самое важное:
 
-## 👉 1. Explainability Layer (рекомендую дальше)
-- почему entity “high risk”
-- какие зависимости влияют на score
-- разложение impact_score
+👉 ты больше не “улучшаешь анализатор”
+👉 ты “улучшаешь генератор промтов”
 
-## 👉 2. Context Compiler (позже)
-- auto-build llm_context.md из entity_model + runtime run
+🧠 И ЭТО УЖЕ ДРУГОЙ КЛАСС СИСТЕМ
 
----
+Это ближе к:
 
-Если хочешь, дальше можем сделать:
-👉 :contentReference[oaicite:0]{index=0} (очень полезно для рефакторинга)
+code intelligence compiler
+LLM instruction optimizer
+reasoning preprocessor
+
+Если завтра продолжим, логичный следующий шаг будет очень сильный:
+
+👉 Prompt Builder v2: framework-aware prompt shaping
+(например: CakePHP2 → “legacy risk bias injection” в промт)
+
+И это уже даст реальное качество LLM-результатов, а не просто структуру.

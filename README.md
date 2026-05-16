@@ -42,20 +42,39 @@ ai-refactor/
 │   └── core/
 │       ├── dependency_propagation.py
 │       ├── dependency_propagation_engine.py
+│       ├── entity_enricher.py
 │       ├── entity_filter.py
 │       ├── entity_model.py
 │       ├── entity_normalizer.py
-│       ├── entity_enricher.py
 │       ├── graph_engine.py
 │       ├── impact_engine.py
 │       │
 │       └── prompt_builder/
 │           ├── base_contract.py
+│           ├── blocks/
+│           │   ├── architecture_block.py
+│           │   ├── base_block.py
+│           │   ├── dependency_block.py
+│           │   ├── impact_block.py
+│           │   ├── output_block.py
+│           │   └── system_rules_block.py
+│           ├── compiler.py
 │           ├── entity_prompt.py
+│           ├── enums.py
 │           ├── impact_prompt.py
 │           ├── prompt_context.py
 │           ├── prompt_renderer.py
-│           └── refactor_prompt.py
+│           ├── refactor_prompt.py
+│           ├── strategies/
+│           │   ├── base_strategy.py
+│           │   ├── debug_strategy.py
+│           │   ├── feature_strategy.py
+│           │   └── refactor_strategy.py
+│           └── templates/
+│               ├── base_template.py
+│               ├── debug_template.py
+│               ├── feature_template.py
+│               └── refactor_template.py
 │
 ├── core/
 │   ├── llm.py
@@ -66,6 +85,7 @@ ai-refactor/
 │   ├── architecture/
 │   │   ├── analysis_system_spec.md
 │   │   ├── chat_memory.md
+│   │   ├── cli_command.md
 │   │   ├── commit_taxonomy.md
 │   │   ├── llm_context.md
 │   │   ├── prompt_contracts.md
@@ -82,8 +102,15 @@ ai-refactor/
     ├── fixtures/
     │   └── cakephp2/
     │       ├── Controller/
+    │       │   ├── CentersController.php
+    │       │   └── UsersController.php
     │       └── Model/
+    │           ├── Center.php
+    │           ├── User.php
+    │           └── UsersCenter.php
     └── smoke/
+        ├── test_prompt_compiler.py
+        └── validate_system.py
 ```
 
 ---
